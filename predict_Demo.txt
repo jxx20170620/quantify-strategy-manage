@@ -1,0 +1,46 @@
+﻿from datetime import timedelta
+
+def on_init(context):
+    context.function.log('init')
+    context.var.myvar = '策略的变量可以存进context.var对象来保存'
+    myvar = '函数内的局部变量在离开函数作用域后实效'
+    # 获取当前时刻的时间和交易日期
+    datetime, date = context.function.get_time()
+    # 获取今天的bar行情
+    data = context.function.get_market_data(date)
+    context.function.log(len(data))
+    # 获取昨天的bar行情
+    last_datetime = datetime - timedelta(days=1)
+    data = context.function.get_market_data(last_datetime)
+    context.function.log(len(data))
+
+
+def on_start(context):
+    context.function.log('started')
+    myvar = context.var.myvar
+    context.var.myvar += '策略可以重复的启动停止，但初始化只有一次'
+
+
+def on_stop(context):
+    context.function.log('stoped')
+    context.myvar = '停止后不会接收执行任何代码'
+
+
+def on_tick(context):
+    context.var.myvar = '某些变量比如tick是由平台维护的，这这个函数里，tick都是最新的'
+    tick = context.var.tick
+
+
+def on_bar(context):
+    bar = context.var.bar
+    context.function.predict({'high': bar.open, 'low': bar.close})
+
+
+def on_order(context):
+    order = context.var.order
+    context.function.log('订单成交')
+
+
+def on_newday(context):
+    context.var.myvar += '每天的24点，平台会调用这个函数'
+    context.function.log('new day')
