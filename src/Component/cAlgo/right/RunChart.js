@@ -47,7 +47,10 @@ const tdstyle = {
 let sdate = '';
 let edate = '';
 let alldata2 = [];
-let MA5Array = [], MA10Array = [], MA30Array = [],MA60Array = [];
+let MA5Array = [],
+  MA10Array = [],
+  MA30Array = [],
+  MA60Array = [];
 class RunChart extends Component {
 
 
@@ -58,7 +61,9 @@ class RunChart extends Component {
       chartData: [],
       Dates: [],
       shortYArr: [],
-      buyYArr: []
+      buyYArr: [],
+      name:'',
+      date:''
     };
   }
 
@@ -68,6 +73,7 @@ class RunChart extends Component {
     let buyYArr = [];
     let shortYArr = [];
     let data = getStatic().datas.concat();
+    // let data = [];
     for (let i = 0; i < data.length; i++) {
       chartData.push([
         data[i].datetime, // the date
@@ -78,7 +84,7 @@ class RunChart extends Component {
       ]);
     }
     let qualification = getStatic().measure_datas;
-    MA5Array  = qualification.EMA5;
+    MA5Array = qualification.EMA5;
     MA10Array = qualification.EMA10;
     MA30Array = qualification.EMA30;
     MA60Array = qualification.EMA60;
@@ -120,7 +126,7 @@ class RunChart extends Component {
 
     let config = {
       chart: {
-        backgroundColor:'#000',
+        backgroundColor: '#000',
         borderRadius: '4px',
         panning: false
       },
@@ -155,19 +161,20 @@ class RunChart extends Component {
           y: 8,
         },
       },
-      exporting:{
-        enabled:false,
+      exporting: {
+        enabled: false,
       },
       credits: {
         enabled: false
       },
       title: {
-        align: 'right',
+        align: 'center',
         // margin: 10,
-        // text: '交易走势图' + '(' + exchange + ' ' + symbol + ' ' + sdate + ')',
+        text: this.state.name + '  ' + this.state.date,
         style: {
-          fontSize: '10px'
-        }
+          // fontWeight: 'bold',
+          fontSize: '20px'
+        },
       },
       legend: {
         enabled: true,
@@ -222,6 +229,7 @@ class RunChart extends Component {
         title: {
           // text: '价格'
         },
+        top:'-10%',
         height: '100%',
         plotLines: [{
           color: '#fff', //线的颜色
@@ -236,11 +244,11 @@ class RunChart extends Component {
       }],
       scrollbar: {
         enabled: true,
-        height:0
+        height: 0
       },
       navigator: {
         enabled: true,
-        height:20
+        height: 20
       },
       plotOptions: {
         series: {
@@ -259,7 +267,7 @@ class RunChart extends Component {
         dataGrouping: {
           enabled: false
         }
-      },{
+      }, {
         type: 'flags',
         data: shortYArr,
         onSeries: "runMarket",
@@ -285,12 +293,12 @@ class RunChart extends Component {
         },
         y: 20,
         name: '看空',
-      },{
+      }, {
         type: 'spline',
         name: 'MA5',
         color: '#fff',
         data: MA5Array,
-        visible:false,
+        visible: false,
         lineWidth: 2,
         dataGrouping: {
           enabled: false
@@ -305,7 +313,7 @@ class RunChart extends Component {
         color: '#e9df21',
         data: MA10Array,
         lineWidth: 2,
-        visible:false,
+        visible: false,
         dataGrouping: {
           enabled: false
         },
@@ -356,8 +364,12 @@ class RunChart extends Component {
 
   }
   componentWillReceiveProps(getProp) {
+    this.setState({
+      name:getProp.title.Strategy.name,
+      date:getProp.title.date,
+    })
     clearInterval(this.run_chart);
-    if (getProp.choosedate == '') {
+    if (getProp.choosedate == undefined) {
       this.makeChart([]);
       return;
     }
@@ -375,7 +387,7 @@ class RunChart extends Component {
     }
     alldata2 = newData;
 
-    setTimeout(() => {//延迟获取行情数据
+    setTimeout(() => { //延迟获取行情数据
       this.makeChart(alldata2);
     }, 1000)
   }
@@ -383,9 +395,9 @@ class RunChart extends Component {
     clearInterval(this.run_chart);
     this.run_chart = setInterval(() => {
       let data = getStatic().datas;
-      if(data!=undefined){
-              clearInterval(this.run_chart);
-              this.makeChart(alldata2);
+      if (data != undefined) {
+        clearInterval(this.run_chart);
+        this.makeChart(alldata2);
       }
     }, 1000);
     window.addEventListener('resize', () => {
@@ -411,6 +423,8 @@ const mapStateToProps = (state) => {
   return {
     choosedate: state.reduToChooseDate.choosedate,
     _id: state.reduToChooseId,
+    // marketDetail: state.reduShowMarketDetail,
+    title: state.reduShowDataTitle,
     // type:state.reduToShowList
   };
 }

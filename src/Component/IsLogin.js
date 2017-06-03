@@ -24,7 +24,7 @@ class IsLogin extends Component {
 		e.preventDefault();
 		let username = $("#username").val();
 		let password = $("#password").val();
-		// let user = Login(username, password);
+
 		Login(username, password).then((user) => {
 			if (typeof(user) == 'string') {
 				this.props.dispatch(alertMessage(user));

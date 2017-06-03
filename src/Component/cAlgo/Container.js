@@ -90,7 +90,7 @@ class Container extends Component {
 		<div>
 				{this.state.isLogin?
 					<div>
-		   <div style={{overflow:'hidden'}}>
+		   <div>
 				     <div className='headDIv noPrintDiv'>
 					    <Head/>
 				     </div>

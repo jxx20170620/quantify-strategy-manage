@@ -269,7 +269,7 @@ class TradeList extends Component {
 				}
 			}
 			for (let y of btstrategys) {
-				if (y.script_id == x.id && y.status != 4) {
+				if (y.script_id == x.id) {
 					x.btstrategys.push(y);
 				}
 			}

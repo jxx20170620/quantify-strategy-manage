@@ -82,11 +82,11 @@ class Head extends Component {
 		document.cookie = "";
 	}
 	exit() {
-		this.clearCookie();
+		// this.clearCookie();
 		localStorage.clear();
 		clearInterval(this.timer);
 		hashHistory.push('/Login');
-		// window.location.reload();
+		window.location.reload();
 	}
 	showModelShare() {
 		this.props.dispatch(ShowList('none'));

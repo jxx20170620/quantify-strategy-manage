@@ -352,7 +352,7 @@ class AddStrategy extends Component {
 	className="modal fade"  tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
 
 		<div className="modal-dialog" role="document" style={{width:'100%'}}>
-			<div className="modal-content" style={{width:'94%',backgroundColor: "#333",fontSize:'13px'}}>
+			<div className="modal-content" style={{width:'93.5%',backgroundColor: "#333",fontSize:'13px'}}>
 				<div className="modal-body main_body">
                    <div className="form-horizontal">
                    <div className="form-group">

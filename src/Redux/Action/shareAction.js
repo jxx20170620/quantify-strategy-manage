@@ -4,11 +4,11 @@
      // console.warn(window.location.href.indexOf('120.27.140.211') > 0 ? '%cAccess Server' : '%cAccess Localhost', 'background: #332a00; color: #ffdc9e');
      // const dataBaseIp = 'http://101.37.28.206:81/';
      // const dataBaseIp = 'http://101.37.28.206:8000/api/'
-     let dataBaseIp = 'http://120.27.140.211/api/';
-     if (window.location.href.indexOf('192') > 0) {
-          dataBaseIp = 'http://121.41.19.183:8080/api/';
-     }
-
+     let dataBaseIp1 = 'http://120.27.140.211/api/';
+     // if (window.location.href.indexOf('192') > 0 || window.location.href.indexOf('121') > 0) {
+     //      dataBaseIp = 'http://121.41.19.183:8080/api/';
+     // }
+     let dataBaseIp = 'http://121.41.19.183:8080/api/';
      const oldDataBase = 'http://114.55.238.82:81/';
      // oldDataBase = 'http://101.37.28.206:81/';
      let staticData = [];
@@ -185,16 +185,15 @@
 
      //根据策略交易所代码获取相应的实例
      export const exchangeGetStra = (exchange, data) => {
-          for (let i = 0; i < data.length; i++) {
-               if (data[i].exchange != exchange) {
-                    data.splice(i, 1);
-                    i = -1;
+               for (let i = 0; i < data.length; i++) {
+                    if (data[i].exchange != exchange) {
+                         data.splice(i, 1);
+                         i = -1;
+                    }
                }
+               return data;
           }
-          return data;
-     }
-
-     //数组排序 传入asc降序 desc升序  根据sortBy字段排序
+          //数组排序 传入asc降序 desc升序  根据sortBy字段排序
      export const getSortFun = (order, sortBy) => {
                let ordAlpah = (order == 'desc') ? '>' : '<';
                let sortFun = new Function('a', 'b', 'return a.' + sortBy + ordAlpah + 'b.' + sortBy + '?1:-1');
@@ -278,37 +277,78 @@
 
      //根据id和时间获取交易数据
      export const getTransaction = (id, start, end) => {
-               let transaction = [];
-               let body = '?strategy_id=' + id;
-               body += '&trade_date=' + start;
-               body += '&type=order'
-               $.ajax({
-                    url: dataBaseIp + 'strategy_datas/' + body,
-                    headers: {
-                         'Authorization': 'token ' + localStorage.getItem("token")
-                    },
-                    type: 'GET',
-                    contentType: false,
-                    processData: false,
-                    async: false,
-                    success: function(data) {
+          let transaction = [];
+          let body = '?strategy_id=' + id;
+          body += '&trade_date=' + start;
+          body += '&type=order'
+          $.ajax({
+               url: dataBaseIp + 'strategy_datas/' + body,
+               headers: {
+                    'Authorization': 'token ' + localStorage.getItem("token")
+               },
+               type: 'GET',
+               contentType: false,
+               processData: false,
+               async: false,
+               success: function(data) {
+                    for (let i in data) {
+                         data[i].datetime = get_unix_timestamp(dateTodate(data[i].datetime));
+                    }
+                    if (data.length > 1) {
                          for (let i in data) {
-                              data[i].datetime = get_unix_timestamp(dateTodate(data[i].datetime));
-                         }
-                         if (data.length > 1) {
-                              for (let i in data) {
-                                   if (data[i].exchange == 'OKCoin') {
-                                        data[i].price *= 0.01;
-                                        data[i].price = Number((data[i].price).toFixed(2));
-                                   }
+                              if (data[i].exchange == 'OKCoin') {
+                                   data[i].price *= 0.01;
+                                   data[i].price = Number((data[i].price).toFixed(2));
                               }
-                              transaction = data;
                          }
-                    },
-                    error: function(data) {}
-               });
-               staticData.transitions = transaction;
-               return transaction;
+                         transaction = data;
+                    }
+               },
+               error: function(data) {}
+          });
+          staticData.transitions = transaction;
+          return transaction;
+     }
+     export const downMarket = (exchange, symbol, start_date, end_date) => {
+               return new Promise((resolve, reject) => {
+                         let transaction = [];
+                         let body = '?exchange=' + exchange;
+                         body += '&symbol=' + symbol;
+                         body += '&start_date=' + start_date;
+                         body += '&end_date=' + end_date;
+                         body += '&type=bar';
+                         $.ajax({
+                              url: 'http://121.41.19.183:8080/api/market_datas/' + body,
+                              headers: {
+                                   'Authorization': 'token 7e6e3af5f7a58513cf061300b989e798b0b6a2d3'
+                              },
+                              type: 'GET',
+                              processData: false,
+                              async: true,
+                              success: function(data) {
+                                   // data = data[0]
+                                   for (let i in data) {
+                                        data[i].datetime = get_unix_timestamp(dateTodate(data[i].datetime));
+                                   }
+                                   data.sort((a, b) => {
+                                        return a.datetime - b.datetime;
+                                   });
+                                   if (data.length > 1) {
+                                        transaction = data;
+
+                                        resolve(transaction);
+                                   } else {
+
+                                        resolve([]);
+                                   }
+                              },
+                              error: function(data) {
+
+                                   resolve([]);
+                              }
+                         });
+                    })
+                    // return transaction;
           }
           //获取行情数据
      export const getDatas = (exchange, symbol, trade_date, type) => {
@@ -319,7 +359,7 @@
                          body += '&trade_date=' + trade_date;
                          body += '&type=' + type;
                          $.ajax({
-                              url: dataBaseIp + 'market_datas/' + body,
+                              url: dataBaseIp1 + 'market_datas/' + body,
                               headers: {
                                    'Authorization': 'token ' + localStorage.getItem("token")
                               },
@@ -465,8 +505,11 @@
 
                     },
                     error: function(data) {
-                         // body...
-                         resolve([])
+                         getStrategys().then((flag) => {
+                              resolve([{
+                                   username: localStorage.getItem("username")
+                              }])
+                         })
 
                     }
                })

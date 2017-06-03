@@ -77,8 +77,7 @@ input {
     min-width: 90%!important;
 }
 
-.scripts_name {
-}
+.scripts_name {}
 
 .but {
     width: 300px;
@@ -189,13 +188,8 @@ button:hover {
     color: #fff
 }
 
-body {
-    overflow-y: hidden;
-}
 
-#rightCenter{
-    margin-top: -35px;
-}
+
 
 /*.leftDiv{
     background-color: red
@@ -221,9 +215,15 @@ body {
     margin-top: 0px;
 }
 
+#rightCenter {
+    margin-top: -35px;
+}
+body {
+    overflow: hidden;
+}
 @media screen and (max-width: 900px) {
     body {
-        overflow-y: auto;
+        overflow: auto;
     }
     .leftDiv {
         width: 99.2%;
@@ -234,6 +234,9 @@ body {
         margin-top: 5px;
         margin-right: 0.4%;
         margin-left: 0.4%;
+    }
+    #rightCenter {
+        margin-top: 0px;
     }
 }
 

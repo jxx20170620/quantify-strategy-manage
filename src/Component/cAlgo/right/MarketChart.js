@@ -17,6 +17,10 @@ import exporting from 'highcharts/modules/exporting'
 import Loading from '../../Loading'
 import $ from 'jquery'
 import light from 'highcharts/themes/grid-light'
+import Switch, {
+  Case,
+  Default
+} from 'react-switch-case';
 import {
   getStra,
   idGetStra,
@@ -37,7 +41,8 @@ import {
   makeMeasure,
   getDay,
   getBrowser,
-  getStatic
+  getStatic,
+  downMarket
 } from '../../../Redux/Action/shareAction'
 let _THIS;
 const conStyle = {
@@ -72,23 +77,32 @@ class MarketChart extends Component {
     this.state = {
       config: '',
       chartData: [],
-      choose: 'MACD'
+      choose: 'MACD',
+      exchange: 'CTP'
     };
   }
-  downData() {
-    let text;
-    text = "datetime,open,high,low,close,volume";
-    for (let i = 0; i < ohlc.length; i++) {
-      text += '\r\n'
-      text += formatDate(ohlc[i][0]) + ',';
-      text += (ohlc[i][1]).toFixed(1) + ',';
-      text += (ohlc[i][2]).toFixed(1) + ',';
-      text += (ohlc[i][3]).toFixed(1) + ',';
-      text += (ohlc[i][4]).toFixed(1) + ',';
-      text += ohlc[i][5];
-    }
-    let name = exchange + '_' + symbol + '_' + start + '_' + Math.round(new Date().getTime());
-    downFile(text, name + '.csv');
+  downData(e) {
+    e.preventDefault();
+    let start_date = $('#start_date').val();
+    let end_date = $('#end_date').val();
+    let exchange = this.state.exchange;
+    let symbol = $('#market_symbol').val();
+    downMarket(exchange, symbol, start_date, end_date).then((data) => {
+        let text;
+        text = "datetime,open,high,low,close,volume";
+        for (let i = 0; i < data.length; i++) {
+          text += '\r\n'
+          text += formatDate(data[i].datetime) + ',';
+          text += (data[i].open).toFixed(1) + ',';
+          text += (data[i].high).toFixed(1) + ',';
+          text += (data[i].low).toFixed(1) + ',';
+          text += (data[i].close).toFixed(1) + ',';
+          text += data[i].volume;
+        }
+        let name = exchange + '_' + symbol + '_' + start_date + '_' + end_date + '_' + Math.round(new Date().getTime());
+        downFile(text, name + '.csv');
+      })
+      // return;
   }
   downQua(index, num) {
     let Data = [];
@@ -181,13 +195,13 @@ class MarketChart extends Component {
     let newClose = data.length > 0 ? data[data.length - 1].close : 0;
     let newVolume = data.length > 0 ? data[data.length - 1].volume : 0;
     let marketDetail = {
-        exchange: exchange,
-        symbol: symbol,
-        date: start,
-        newClose: newClose,
-        newVolume: newVolume
-      }
-      // this.props.dispatch(showMarketDetail(marketDetail));
+      exchange: exchange,
+      symbol: symbol,
+      date: start,
+      newClose: newClose,
+      newVolume: newVolume
+    }
+    this.props.dispatch(showMarketDetail(marketDetail));
     let config = {
       chart: {
         backgroundColor: '#000',
@@ -239,7 +253,7 @@ class MarketChart extends Component {
       title: {
         align: 'center',
         useHTML: true,
-        text: exchange + ' ' + symbol + ' ' + start + "  <span class='chart_title'>" + newClose + ',' + newVolume + "</span>",
+        text: document.body.clientWidth > 900 ? exchange + ' ' + symbol + ' ' + start + "  <span class='chart_title'>" + newClose + ',' + newVolume + "</span>" : null,
         style: {
           fontWeight: 'bold',
           fontSize: '20px'
@@ -744,7 +758,8 @@ class MarketChart extends Component {
             menuItems: [{
               text: '导出行情数据',
               onclick: function() {
-                _THIS.downData();
+                // _THIS.downData();
+                $('#downMarket').css('display', 'block');
               }
             }, {
               text: '导出指标数据',
@@ -806,9 +821,10 @@ class MarketChart extends Component {
   // clearInterval(this.timer);
   componentWillReceiveProps(getProp) {
     if (getProp.choosedate == undefined) {
-      if(getProp.type!='id'){return;}
+      if (getProp.type != 'id') {
+        return;
+      }
       this.makeChart(false);
-      // this.componentDidMount();
       return;
     }
     start = getProp.choosedate;
@@ -836,15 +852,23 @@ class MarketChart extends Component {
     setTimeout(() => {
       this.makeChart();
     }, 300)
-    this.timer = setInterval(() => {
-      this.makeChart();
-    }, 120000);
+    if (week <= 5) {
+      this.timer = setInterval(() => {
+        this.makeChart();
+      }, 120000);
+    }
     window.addEventListener('resize', () => {
       setTimeout(() => {
         this.makeChart(false);
       }, 300)
 
     })
+    $('#start_date').val('2017-05-25');
+    $('#end_date').val('2017-05-26');
+  }
+  componentDidUpdate() {
+    $('#start_date').val('2017-05-25');
+    $('#end_date').val('2017-05-26');
   }
   componentWillUnmount() {
     this.timer && clearTimeout(this.timer);
@@ -853,6 +877,15 @@ class MarketChart extends Component {
   closeDown() {
     $('#downData').css('display', 'none');
   }
+  closeDownMarket() {
+    $('#downMarket').css('display', 'none');
+  }
+  changeExchange(e) {
+    this.setState({
+      exchange: e.target.value
+    })
+  }
+
   render() {
     const modalBody = {
       color: '#fff',
@@ -916,20 +949,43 @@ class MarketChart extends Component {
       right: 'auto',
       bottom: 'auto',
       width: document.body.clientWidth > 900 ? 400 : '100%',
-      height: '150px'
+      // height: '150px'
+    }
+    const modalStyle2 = {
+      top: '10%',
+      left: document.body.clientWidth > 900 ? document.body.clientWidth / 2 - 150 : '0',
+      right: 'auto',
+      bottom: 'auto',
+      width: document.body.clientWidth > 900 ? 300 : '100%',
+      // height: '150px'
+    }
+    const input_style = {
+      width: "100%",
+      marginBottom: '5px',
+      display: 'inline',
+      // marginLeft:'10%',
+      marginTop: '5px'
+    }
+    const backColor = {
+      backgroundColor: '#525252',
+      color: "#fff",
+      width: '100%',
+      height: '34px',
+      border: '0px',
+      marginTop: '10px'
     }
     _THIS = this;
     return (
       <div id='markert_chart_p' style={{border:'5px solid #525252',borderRadius:'4px',width:'100%',height:'100%'}}>
         <div id="markert_chart"  style={{height:'100%',width:'100%',backgroundColor:'#000',borderRadius: '4px',}}>
         </div>
-        <div style={modalStyle} 
+        <div style={modalStyle2} 
         className="modal fade in" id="downData"  role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-          <div className="modal-dialog">
-            <div className="col-md-8 col-sm-12 modal-content" ref="choose" style={{backgroundColor: "#333",height:'100%'}}>
+          <div className="modal-dialog" style={{width:'100%'}}>
+            <div className="modal-content" ref="choose" style={{width:'93.5%',backgroundColor: "#333",height:'100%'}}>
               <div className="modal-body" style={modalBody}>
                     <div className="form-group">
-                          <select style={{marginLeft:'20px',marginTop:'20px',backgroundColor:'#525252',color:"#fff",width:'auto',display:"inline"}}  
+                          <select style={backColor}  
                           className="" onChange={(e)=>{this.setState({choose:e.target.value})}} value={this.state.choose}>
                           {options.map((x,index)=>{
                               return(
@@ -949,6 +1005,67 @@ class MarketChart extends Component {
            </div>
          </div>
       </div>
+    <form style={modalStyle2} onSubmit={(e)=>this.downData(e)} 
+        className="modal fade in" id="downMarket"  role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+          <div className="modal-dialog" style={{width:'100%'}}>
+            <div className="modal-content" ref="choose" style={{width:'93.5%',backgroundColor: "#333",height:'100%'}}>
+              <div className="modal-body" style={modalBody}>
+              <div className="form-group">
+                      <select style={backColor} required="required"  id='exchange' value={this.state.exchange}  onChange={(e)=>this.changeExchange(e)}>
+                        <option>CTP</option>
+                        <option>CSRPME</option>
+                        <option>OKCoin</option>
+                        </select>
+                        </div>
+                        <div className="form-group">
+              <Switch condition={this.state.exchange}>
+
+              <Case value='CTP'>
+              <select style={backColor} required="required" id="market_symbol">
+                        <option>IF</option>
+                        <option>IC</option>
+                        <option>IH</option>  
+         </select>       
+            </Case>
+
+              <Case value='CSRPME'>
+                        <select style={backColor} required="required" id="market_symbol">
+
+                                       <option>D1_AG</option>
+                        <option>D6_SB</option>
+                         </select> 
+              </Case>
+
+             <Case value='OKCoin'>
+                       <select style={backColor} required="required" id="market_symbol">
+
+                        <option>btc</option>
+                        <option>ltc</option>
+                         </select> 
+         </Case>
+
+            </Switch>
+                     </div>
+                    <div className="form-group">
+                       <input type='text'  required="required" style={input_style} id="start_date" placeholder='开始时间(例:2017-06-01)'></input>
+                    </div>
+                    <div className="form-group">
+                       <input type='text'  required="required" style={input_style} id="end_date" placeholder='结束时间(例:2017-06-02)'></input>
+                   </div>
+              </div>
+              <div className="modal-footer" style={{borderTop:'0px solid #525252',marginTop:'-10px'}}>
+                <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.closeDownMarket.bind(this)}>关闭
+                </button>
+                 <button type="submit" className="btn btn-primary" data-dismiss="modal" 
+                 // onClick={this.downData.bind(this)}
+                 >
+                  下载
+                 </button>
+              </div>
+           </div>
+         </div>
+      </form>
+
     </div>
     )
   }

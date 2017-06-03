@@ -243,6 +243,8 @@ let ListTodo = React.createClass({
     showError: function(error) {
         if (error != '' && error!=null) {
             _dispatch(alertMessage(error));
+        }else{
+            _dispatch(alertMessage('没有错误信息'));
         }
     },
     render: function() {
