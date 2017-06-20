@@ -1,13 +1,22 @@
-import React,{Component} from 'react'
-import {connect} from 'react-redux'
-import {alertHide} from '../Redux/Action/Action'
-import {getLog} from '../Redux/Action/shareAction'
+import React, {
+	Component
+} from 'react'
+import {
+	connect
+} from 'react-redux'
+import {
+	alertMessage
+} from '../Redux/Action/Action'
+import {
+	getLog
+} from '../Redux/Action/shareAction'
 import $ from 'jquery'
 import Loading from './Loading.js'
 import {
 	downFile,
 	formatDate,
-	getDateList
+	getDateList,
+	getStrategy
 } from '../Redux/Action/shareAction'
 var params = {
 	left: '430px',
@@ -16,16 +25,16 @@ var params = {
 	currentY: 0,
 	flag: false
 };
-var offsetLeft,offsetTop,log_timer,mouse_x,mouse_y,margin_left,margin_top;
-var to_x,to_y;
-class Log extends Component{
+var offsetLeft, offsetTop, log_timer, mouse_x, mouse_y, margin_left, margin_top;
+var to_x, to_y;
+class Log extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			messageText: '',
 			name: '',
-			DateList:[],
-			logDate:''
+			DateList: [],
+			logDate: ''
 		}
 
 	}
@@ -79,7 +88,7 @@ class Log extends Component{
 				var disX = nowX - params.currentX,
 					disY = nowY - params.currentY;
 				var endX = parseInt(params.left) + disX,
-				    endY = parseInt(params.top) + disY;
+					endY = parseInt(params.top) + disY;
 				// if (endX < 0) {
 				// 	endX = 0;
 				// 	params.left = 0;
@@ -143,7 +152,7 @@ class Log extends Component{
 			}, 5);
 		};
 	}
-	beforeRender(id, name ,date) {
+	beforeRender(id, name, date) {
 		$('#Mylog').css("display", "inline");
 		$("#messageText").html("");
 		$('#loading').css("display", "inline");
@@ -176,11 +185,23 @@ class Log extends Component{
 		this.setState({
 			DateList: DateList,
 		})
+		if (DateList.length == 0) {
+			this.props.dispatch(alertMessage('没有日期数据',2000));
+			return;
+		}
 		this.beforeRender(getProp.log.id, getProp.log.name, DateList[DateList.length - 1])
 	}
 	refresh() {
-		// console.log(this.state.logDate)
+		let strategy = getStrategy(this.props.log.id);
+		if (strategy.status == -1) {
+			this.props.dispatch(alertMessage('------------该实例出现错误------------\n' + strategy.error));
+			return;
+		}
 		let DateList = getDateList(this.props.log.id);
+		if (DateList.length == 0) {
+			this.props.dispatch(alertMessage('没有日期数据',2000));
+			return;
+		}
 		this.setState({
 			DateList: DateList,
 		})
@@ -194,12 +215,12 @@ class Log extends Component{
 		// $("#messageText").html("");
 		// $('#loading').css("display", "inline");
 	}
-	downLog(){
+	downLog() {
 		let text = this.state.messageText;
-		let name = this.state.name + '_' +this.state.logDate + '_log_' + Math.round(new Date().getTime());
-		downFile(text,name+'.txt');
+		let name = this.state.name + '_' + this.state.logDate + '_log_' + Math.round(new Date().getTime());
+		downFile(text, name + '.txt');
 	}
-	render(){
+	render() {
 		const modalStyle = {
 			top: document.body.clientWidth < 900 ? '5%' : params.top,
 			left: document.body.clientWidth < 900 ? '0%' : params.left,
@@ -215,7 +236,7 @@ class Log extends Component{
 			height: '83%',
 			width: '96%',
 			overflow: 'auto',
-			margin:'0px 10px'
+			margin: '0px 10px'
 		}
 		const btnBg = {
 			backgroundColor: '#292929',
@@ -223,7 +244,7 @@ class Log extends Component{
 			border: '0px solid #525252',
 			height: '25px',
 			borderRadius: '2px',
-			marginLeft:'5px'
+			marginLeft: '5px'
 		}
 		return (
 			<div>
@@ -272,8 +293,10 @@ class Log extends Component{
 		)
 	}
 }
-const mapStateToProps =(state)=>{
-	return {log:state.reduLog};
+const mapStateToProps = (state) => {
+	return {
+		log: state.reduLog
+	};
 }
 
 export default connect(mapStateToProps)(Log);

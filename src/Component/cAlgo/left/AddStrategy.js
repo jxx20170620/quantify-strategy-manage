@@ -8,7 +8,11 @@ import {
 	saveStrategyList,
 	saveBtstrategyList,
 	updateClass,
-	showProgress
+	showProgress,
+	saveToChoose3,
+	showLoading,
+	showDataTitle,
+	showPredictRecord
 } from '../../../Redux/Action/Action'
 import {
 	connect
@@ -25,7 +29,10 @@ import {
 	getNextDay,
 	getStatic,
 	getStrategys,
-	getAccounts
+	getAccounts,
+	addClass,
+	strategyAction,
+	getStrategy
 } from '../../../Redux/Action/shareAction'
 let _This;
 const astyle = {
@@ -93,7 +100,7 @@ class AddStrategy extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			type: '实盘模拟',
+			type: '历史回测',
 			showTip: true,
 			showLaserBeam: false,
 			btnText: '确定',
@@ -108,42 +115,87 @@ class AddStrategy extends Component {
 			})
 		})
 	}
-	componentWillReceiveProps() {}
-	componentDidMount() {
-		// let accouts = [{
-		// 	"id": "CSRPME75512345",
-		// 	"name": "75512345",
-		// 	"username": "admin",
-		// 	"exchange": "CSRPME",
-		// 	"money": null,
-		// 	"position": null
-		// }];
+	componentWillReceiveProps(nextProps) {
+
+		if (nextProps.flag) {
+			this.setState({
+				type: '历史回测'
+			})
+			$('.filter-option').find('.label').eq(0).attr('class', 'label label-success');
+			$('.filter-option').find('.label').eq(0).html('历史回测');
+		}
+	}
+	componentDidUpdate(prevProps, prevState) {
+
 	}
 	add(e) {
 
 		e.preventDefault();
-		this.props.dispatch(showProgress(true));
-		// setTimeout(() => {
-		this.addStra();
-		// },200)
+		if (this.props.flag) {
+			this.props.dispatch(showLoading(true));
+			this.addScirpt();
+		} else {
+			this.props.dispatch(showProgress(true));
+			this.addStra();
+		}
 	}
-	addStra() {
-		// console.log($(" #exchange ").val(),$(" #symbol ").val())
+	addScirpt() {
+		let run_code = getStatic().run_code;
+		let formdata = new FormData();
+		formdata.append('mode', $('#class_type').val());
+		formdata.append('name', 'demo_' + Date.parse(new Date()));
+		formdata.append('code', new Blob([run_code]));
+		if ($('#class_type').val() == 'predict') {
+			let formatJson = [{
+				name:'max',
+				type:'float',
+				information:''
+			},{
+				name:'min',
+				type:'float',
+				information:''
+			},{
+				name:'avg',
+				type:'float',
+				information:''
+			},{
+				name:'max_acc',
+				type:'float',
+				information:''
+			},{
+				name:'min_acc',
+				type:'float',
+				information:''
+			},{
+				name:'avg_acc',
+				type:'float',
+				information:''
+			}];
+			formatJson = JSON.stringify(formatJson);
+			formdata.append('predict_format', formatJson);
+		}
+
+		addClass(formdata).then((data) => {
+			this.addBackTest(data.id);
+		}, (result) => {
+			this.props.dispatch(showLoading(false));
+			this.props.dispatch(alertMessage(result, 60000));
+		})
+	}
+	addBackTest(script_id) {
 		let formdata = new FormData();
 		let file_info = {
 			model_type: '',
 			int_data: {},
 			string_data: {}
 		};
-		// console.log($(" #class_id ").val())
-		formdata.append('script_id', $(" #class_id ").val());
+		formdata.append('script_id', script_id);
 		formdata.append('name', $(" #name ").val());
 		formdata.append('exchange', $(" #exchange ").val());
 		formdata.append('symbol', $(" #symbol ").val());
 
 
 		if ($(" #mode_file ")[0].files[0] == undefined) {
-			// this.props.dispatch(alertMessage('未添加模型文件', 2000));
 			file_info.model_type = 'none';
 		} else {
 			formdata.append('file', $(" #mode_file ")[0].files[0]);
@@ -201,34 +253,181 @@ class AddStrategy extends Component {
 
 		formdata.append('file_info', JSON.stringify(file_info));
 
-		addTrade(formdata, this.onprogress).then((flag) => {
-			if (flag) {
-				this.props.dispatch(alertMessage('添加成功', 2000));
-				this.props.dispatch(showProgress(false));
+		addTrade(formdata, this.test).then((data) => {
+			this.runBackTest(data.id);
+		}, (data) => {
+			this.props.dispatch(alertMessage('运行失败', 2000));
+			this.props.dispatch(showLoading(false));
+			this.setState({
+				btnText: '确定'
+			})
+		})
+	}
+	test(){
+
+	}
+	checkStatus(strategy_id) {
+		return new Promise((resolve, reject) => {
+			let num = 0;
+			this.checktimer = setInterval(() => {
+				let strategy = getStrategy(strategy_id);
+				this.props.dispatch(showLoading(true));
+				num++;
+				if (strategy.status == 4) {
+					console.log('该回测运行'+num*5+'s');
+					this.checktimer && clearTimeout(this.checktimer);
+					clearInterval(this.checktimer);
+					resolve(strategy);
+				}
+				if(strategy.status == -1){
+					this.checktimer && clearTimeout(this.checktimer);
+					clearInterval(this.checktimer);
+					reject(strategy);
+				}
+			}, 5000);
+		});
+	}
+	runBackTest(strategy_id) {
+		if (strategyAction(true, strategy_id, 2)) {
+			this.checkStatus(strategy_id).then((strategy) => {
+				if ($('#class_type').val() == 'predict') {
+					this.props.dispatch(showPredictRecord(strategy_id, strategy.name, $(" #class_id ").val()));
+					this.props.dispatch(alertMessage('运行成功', 2000));
+					this.props.dispatch(showLoading(false));
+					$('#myModal2').css('display', 'none');
+					$('.modal-backdrop').eq(0).remove();
+					this.setState({
+						btnText: '确定'
+					})
+					return;
+				}
+				
+				let title = [];
+				title = {
+					Strategy: strategy,
+					date: strategy.start
+				};
+				this.props.dispatch(showDataTitle(title));
+				this.props.dispatch(saveToChooseDate(strategy.start));
+				this.props.dispatch(saveToChooseId(strategy_id));
+				this.props.dispatch(saveToChoose3(strategy));
+
+
+				this.props.dispatch(alertMessage('运行成功', 2000));
+				this.props.dispatch(showLoading(false));
 				$('#myModal2').css('display', 'none');
 				$('.modal-backdrop').eq(0).remove();
 				this.setState({
 						btnText: '确定'
 					})
-					// getStrategys();
-				getStrategys().then((data) => {
-					// if (api == 'strategys') {
-					this.props.dispatch(saveStrategyList(getAllStrategy(true), false));
-					// } else {
-					this.props.dispatch(saveBtstrategyList(getAllStrategy(false), false));
-					// }
-					this.props.dispatch(updateClass());
-				})
-
-
-			} else {
-				this.props.dispatch(alertMessage('添加失败', 2000));
-				this.props.dispatch(showProgress(false));
+					//获取交易数据
+			}, (data) => {
+				this.props.dispatch(alertMessage('该实例出错:' + data.error));
+				this.props.dispatch(showLoading(false));
+				$('#myModal2').css('display', 'none');
+				$('.modal-backdrop').eq(0).remove();
 				this.setState({
 					btnText: '确定'
 				})
-			}
+			})
+		} else {
+			this.props.dispatch(alertMessage('运行失败', 2000));
+			this.props.dispatch(showLoading(false));
+		}
+	}
 
+	addStra() {
+
+		let formdata = new FormData();
+		let file_info = {
+			model_type: '',
+			int_data: {},
+			string_data: {}
+		};
+
+		formdata.append('script_id', $(" #class_id ").val());
+		formdata.append('name', $(" #name ").val());
+		formdata.append('exchange', $(" #exchange ").val());
+		formdata.append('symbol', $(" #symbol ").val());
+
+
+		if ($(" #mode_file ")[0].files[0] == undefined) {
+			file_info.model_type = 'none';
+		} else {
+			formdata.append('file', $(" #mode_file ")[0].files[0]);
+
+			$("#addModelFile").find("input[type='text']").each(function() {
+				let getId = $(this)[0].id;
+				if ($(this).val() != '' && $(this).val() != undefined) {
+					file_info.string_data[getId] = $(this).val();
+				}
+			})
+			$("#addModelFile").find("input[type='number']").each(function() {
+				let getId = $(this)[0].id;
+				if ($(this).val() != '' && $(this).val() != undefined) {
+					file_info.int_data[getId] = $(this).val();
+				}
+			})
+			switch ($(" #model_type ").val()) {
+				case '经典时间序列自回归模型':
+					file_info.model_type = 'regress';
+					break;
+				case '机器学习分类模型':
+					file_info.model_type = 'machine_classify';
+					break;
+				case '机器学习回归模型':
+					file_info.model_type = 'machine_regress';
+					break;
+				case '金融技术指标回归模型':
+					file_info.model_type = 'finance_regress';
+					break;
+				default:
+					break;
+			}
+		}
+		let api;
+		switch (this.state.type) {
+			case '实盘模拟':
+				api = 'strategys';
+				formdata.append('mode', 'realtime');
+				formdata.append('multiple', $(" #multiple ").val());
+				break;
+			case '真实交易':
+				api = 'strategys';
+				formdata.append('mode', 'realtime');
+				formdata.append('multiple', $(" #multiple ").val());
+				formdata.append('account_id', $(" #account_id ").val());
+				break;
+			case '历史回测':
+				api = 'btstrategys';
+				formdata.append('mode', 'backtest');
+				formdata.append('start', $(" #start ").val());
+				formdata.append('end', $(" #end ").val()); //时间需要+1
+				break;
+		}
+
+
+		formdata.append('file_info', JSON.stringify(file_info));
+
+		addTrade(formdata, this.onprogress).then((data) => {
+
+			this.props.dispatch(alertMessage('添加成功', 2000));
+			this.props.dispatch(showProgress(false));
+			$('#myModal2').css('display', 'none');
+			$('.modal-backdrop').eq(0).remove();
+			this.setState({
+				btnText: '确定'
+			})
+			getStrategys().then((data) => {
+				this.props.dispatch(updateClass());
+			})
+
+		}, (data) => {
+			this.props.dispatch(alertMessage('添加失败', 2000));
+			this.props.dispatch(showProgress(false));
+			this.setState({
+				btnText: '确定'
+			})
 		})
 
 	}
@@ -322,7 +521,7 @@ class AddStrategy extends Component {
 			backgroundColor: '#525252',
 			color: "#fff",
 			width: '100%',
-			display:'inline'
+			display: 'inline'
 		}
 		const modalStyle = {
 			top: '5%',
@@ -330,7 +529,8 @@ class AddStrategy extends Component {
 			right: 'auto',
 			bottom: 'auto',
 			width: document.body.clientWidth > 900 ? 400 : '100%',
-			color: '#fff'
+			color: '#fff',
+			// display:'none'
 		}
 		const btnBg = {
 			// border:'0px',
@@ -344,26 +544,39 @@ class AddStrategy extends Component {
 			marginLeft: '15px'
 		}
 		return (
-			<div style={{color:'#fff'}}>
-  <input type="text" id="class_id" hidden></input>
-  {/*<input type="text" id="class_type" hidden></input>
-*/}	<form id="myModal2"  onSubmit={(e)=>this.add(e)} 
-	style={modalStyle} 
-	className="modal fade"  tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
+			<div 
+			// style={{color:'#fff'}}
 
-		<div className="modal-dialog" role="document" style={{width:'100%'}}>
-			<div className="modal-content" style={{width:'93.5%',backgroundColor: "#333",fontSize:'13px'}}>
-				<div className="modal-body main_body">
+			>
+  <input type="text" id="class_id" hidden></input>
+  <input type="text" id="class_type" hidden></input>
+
+	<form   onSubmit={(e)=>this.add(e)} 
+				id="myModal2"
+				className="modal fade"  
+				style={modalStyle} 
+	// data-step="3" data-intro='设置实例信息' data-position="right"
+
+	tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+		<div
+		 className="modal-dialog" role="document" style={{width:'100%'}}>
+			<div className="modal-content"
+			
+			 style={{width:'93.5%',backgroundColor: "#333",fontSize:'13px'}}>
+				<div className="modal-body main_body"
+				
+				>
                    <div className="form-horizontal">
                    <div className="form-group">
                    	    <span style={{color:'#ffc266',marginLeft:'9%'}} id='add_script_name'>test</span>
                    </div>
-		                <div className="form-group">
+		                <div className="form-group" id='choose_strategy_div'>
 		                    <label className="col-sm-4 modal_lable control-label" style={{display:'block'}}>
 		                    	实例类型
 		                    </label>
 		                    <div className="col-sm-8 modal_div">
-		                    <select className="selectpicker" value={this.state.type} onChange={(e)=>{this.setState({type:e.target.value})}}>
+		                    <select id='choose_strategy_type' className="selectpicker" value={this.state.type} onChange={(e)=>{this.setState({type:e.target.value})}}>
                              <option data-content="<span class='label label-info'>实盘模拟</span>">实盘模拟</option>
                              <option data-content="<span class='label label-success'>历史回测</span>">历史回测</option>
                              <option data-content="<span class='label label-warning'>真实交易</span>">真实交易</option>
@@ -536,14 +749,21 @@ class AddStrategy extends Component {
 			</div>
 		</div>
 	</form>
+
 </div>
 		)
 	}
 }
 const mapStateToProps = (state) => {
 	return {
+		flag: state.reduToRunBack.flag,
+		time: state.reduToRunBack.time
+	};
+}
+const mapDispatchToProps = (dispatch) => {
+	return {
 
 	};
 }
 
-export default connect()(AddStrategy); //,{ alertHide }
+export default connect(mapStateToProps)(AddStrategy);

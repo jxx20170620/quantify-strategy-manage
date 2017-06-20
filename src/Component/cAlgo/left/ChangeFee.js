@@ -136,11 +136,11 @@ class ChangeFee extends Component {
 							<div className="modal-footer" style={{borderTop:'0px solid #525252',paddingTop:'0px'}}>
 								<button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.close.bind(this)}>关闭
 								</button>
-								
+								{localStorage.getItem("username")=='admin'?
 								<button disabled={!this.state.showFlag} type="button" className="btn btn-primary" ref='btnStr' onClick={this.change.bind(this)}>
 									修改
 								</button>
-								
+								:null}
 							</div>
 						</div>
 					</div>

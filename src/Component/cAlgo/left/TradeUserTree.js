@@ -18,19 +18,33 @@ class TradeUserTree extends Component {
 			users: [],
 		}
 	}
-	componentWillMount() {
+	beforeRender() {
 		getUserList().then((users) => {
 			getClasss().then((scripts) => {
+				
+				// let allstra = getStatic().all_stra;
+				// let noscript_stra = [];
+				// for(let x of allstra){
+				// 	let flag = true;
+				// 	for(let y of scripts){
+				// 		if(x.script_id == y.id){
+				// 			flag = false;
+				// 			break;
+				// 		}
+				// 	}
+				// 	if(flag){
+				// 		noscript_stra.push(x);
+				// 	}
+				// }
+				// console.log(noscript_stra)
+
 				for (let i in users) {
 					users[i].trade = [];
-					users[i].predict = [];
 					for (let j in scripts) {
 						if (users[i].username == scripts[j].username) {
 							if (scripts[j].mode == 'trade') {
 								users[i].trade.push(scripts[j]);
-							} else {
-								users[i].predict.push(scripts[j]);
-							}
+							} 
 						}
 					}
 				}
@@ -46,6 +60,16 @@ class TradeUserTree extends Component {
 			})
 		})
 	}
+	componentWillReceiveProps(nextProps) {
+		$('.userCircle').each(function(i) {
+			$(this).attr("class", "userCircle fa fa-plus-circle collapsed");
+			$(this).parent().removeClass('open');
+		})
+		this.beforeRender();
+	}
+	componentWillMount() {
+		this.beforeRender();
+	}
 	mouseOut(username) {
 		$('#name_' + username).css('color', '#808080');
 		$('#list_' + username).css('backgroundColor', '#3b3b3b');
@@ -54,20 +78,20 @@ class TradeUserTree extends Component {
 		$('#name_' + username).css('color', '#fff');
 		$('#list_' + username).css('backgroundColor', '#525252');
 	}
-	showList(e,username){
+	showList(e, username) {
 		let oldClass = e.target.className;
-        $('.userMenu').each(function(index, el) {
-            if('scripts_' + username != el.id){
-                $(this).removeClass('in');
-            }
-        });
-        $('.userCircle').each(function(i) {
-            $(this).attr("class", "userCircle fa fa-plus-circle collapsed");
-            $(this).parent().removeClass('open');
-        })
-		if(oldClass == "userCircle fa fa-plus-circle collapsed"){
-		    e.target.className = 'userCircle fa fa-minus-circle';
-		}else{
+		$('.userMenu').each(function(index, el) {
+			if ('scripts_' + username != el.id) {
+				$(this).removeClass('in');
+			}
+		});
+		$('.userCircle').each(function(i) {
+			$(this).attr("class", "userCircle fa fa-plus-circle collapsed");
+			$(this).parent().removeClass('open');
+		})
+		if (oldClass == "userCircle fa fa-plus-circle collapsed") {
+			e.target.className = 'userCircle fa fa-minus-circle';
+		} else {
 			e.target.className = "userCircle fa fa-plus-circle collapsed";
 		}
 	}
@@ -78,6 +102,7 @@ class TradeUserTree extends Component {
 		let user_list = this.state.users.map((x, index) => {
 			return (
 				<div key={index}>
+				{localStorage.getItem("username") == 'admin'?
 				<div className='listback' id={'list_' + x.username}
              onMouseOut={(e)=>this.mouseOut(x.username)}
              onMouseOver={(e)=>this.mouseOver(x.username)}
@@ -90,8 +115,10 @@ class TradeUserTree extends Component {
 		            &nbsp;
 		         	{x.trade.length}
 		       </span>
-		       </div>
-		         <div  style={{width:'100%'}} id={'scripts_' + x.username} className="userMenu collapse">
+		       </div>:null}
+		         <div  style={{width:'100%'}} id={'scripts_' + x.username} 
+		         className={localStorage.getItem("username") == 'admin'?"userMenu collapse":"userMenu collapse in"}
+		         >
 		             <TradeList trade={x.trade} username={x.username} />
                  </div>
              </div>
@@ -106,7 +133,7 @@ class TradeUserTree extends Component {
 }
 const mapStateToProps = (state) => {
 	return {
-
+		update: state.reduUpdateClass,
 	};
 }
 

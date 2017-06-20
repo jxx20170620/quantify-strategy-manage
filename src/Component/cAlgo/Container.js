@@ -1,10 +1,21 @@
-import React, {Component} from 'react'
-import {connect} from 'react-redux'
+import React, {
+	Component
+} from 'react'
+import {
+	connect
+} from 'react-redux'
 import Left from './left/Left'
 import Right from './right/Right'
 import Head from './left/Head'
-import { hashHistory } from 'react-router'
-import {alertMessage} from '../../Redux/Action/Action'
+import {
+	hashHistory
+} from 'react-router'
+import {
+	alertMessage
+} from '../../Redux/Action/Action'
+import {
+	gateways
+} from '../../Redux/Action/shareAction'
 import AlertApp from '../AlertApp'
 import ScreenLoading from '../ScreenLoading'
 import Log from '../Log'
@@ -39,6 +50,8 @@ class Container extends Component {
 			})
 			hashHistory.push('/Login');
 		} else {
+			gateways('CSRPME');
+			gateways('OKCoin');
 			this.setState({
 				isLogin: true
 			})
@@ -52,7 +65,7 @@ class Container extends Component {
 			// console.log(el);
 		});
 		document.body.style.backgroundColor = '#3a3a3a';
-		$('.rightDiv').css('width', $(window).width() > 880 ? $(window).width() - 385 : $(window).width()*0.992);
+		$('.rightDiv').css('width', $(window).width() > 880 ? $(window).width() - 385 : $(window).width() * 0.992);
 		window.addEventListener('resize', this.onWindowResize.bind(this))
 	}
 	componentWillUnmount() {
@@ -68,7 +81,7 @@ class Container extends Component {
 			return;
 		}
 		setTimeout(() => {
-				$('.rightDiv').css('width', $(window).width() > 880 ? $(window).width() - 385 : $(window).width()*0.992);
+				$('.rightDiv').css('width', $(window).width() > 880 ? $(window).width() - 385 : $(window).width() * 0.992);
 				$('.modal').each(function(index, el) {
 					// console.log(el.id,el.style.width,parseInt(el.style.width, 10));
 					$(this).css('left', document.body.clientWidth / 2 - parseInt(el.style.width, 10) / 2);
@@ -87,7 +100,7 @@ class Container extends Component {
 	}
 	render() {
 		return (
-		<div>
+			<div>
 				{this.state.isLogin?
 					<div>
 		   <div>

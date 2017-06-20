@@ -24,15 +24,17 @@ import {
   delStrategy,
   getStrategy,
   getNianHua,
-  getDatas
+  getDatas,
+  getStatic
 } from '../Redux/Action/shareAction'
+import exporting from 'highcharts/modules/exporting'
 import $ from 'jquery'
 const conStyle = {
   backgroundColor: '#292929',
   color: '#FFFFFF',
   border: '0px solid #525252'
 }
-
+var chart;
 // let chartwidth = document.body.clientWidth < 992 ? document.body.clientWidth * 0.97 : document.body.clientWidth * 0.748;
 // let chartheight = (document.documentElement.clientHeight - 120) / 2 + 170;
 class Chart extends Component {
@@ -93,9 +95,9 @@ class Chart extends Component {
       credits: {
         enabled: false
       },
-      exporting: {
-        enabled: false
-      },
+      // exporting: {
+      //   enabled: true
+      // },
       tooltip: {
         xDateFormat: '%Y-%m-%d %H:%M:%S',
         backgroundColor: '#292929', // 背景颜色
@@ -283,9 +285,9 @@ class Chart extends Component {
       credits: {
         enabled: false
       },
-      exporting: {
-        enabled: false
-      },
+      // exporting: {
+      //   enabled: true
+      // },
       tooltip: {
         xDateFormat: '%Y-%m-%d %H:%M:%S',
         backgroundColor: '#292929', // 背景颜色
@@ -479,16 +481,43 @@ class Chart extends Component {
           },
           y: 20
         }
-      ]
+      ],
+      exporting: {
+        buttons: {
+          contextButton: {
+            menuItems: [{
+              text: '导出JPEG',
+              onclick: function() {
+                this.exportChart({
+                  type: 'image/jpeg'
+                });
+              }
+            }, {
+              text: '导出PNG',
+              onclick: function() {
+                this.exportChart();
+              }
+            }, {
+              text: '导出PDF',
+              onclick: function() {
+                this.exportChart({
+                  type: 'application/pdf'
+                });
+              }
+            }]
+          }
+        },
+      }
     };
+    exporting(Highcharts);
     // unica(Highcharts);
-    Highcharts.setOptions({
+      Highcharts.setOptions({
       global: {
         useUTC: false
       }
     });
-    // console.log(name,chartData)
-    Highcharts.StockChart('predict_Chart_' + name, config);
+    var chart = Highcharts.StockChart('predict_Chart_' + name, config);
+    getStatic().predictChart.push(chart);
   }
   componentWillMount() {
     this.setState({
@@ -528,7 +557,7 @@ class Chart extends Component {
     // }
     this.makeChart(data, this.props.name, this.props.market_info, this.props.type);
   }
-
+ 
 
   render() {
     const chart = {
@@ -539,7 +568,9 @@ class Chart extends Component {
 
     let _id = 'predict_Chart_' + this.state.chart_name;
     return (
+
       <div className='predict_chart' id={_id} style={chart}></div>
+      
     )
   }
 }

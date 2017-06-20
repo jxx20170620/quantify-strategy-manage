@@ -18,17 +18,14 @@ class PredictUserTree extends Component {
 			users: [],
 		}
 	}
-	componentWillMount() {
+	beforeRender() {
 		getUserList().then((users) => {
 			getClasss().then((scripts) => {
 				for (let i in users) {
-					users[i].trade = [];
 					users[i].predict = [];
 					for (let j in scripts) {
 						if (users[i].username == scripts[j].username) {
-							if (scripts[j].mode == 'trade') {
-								users[i].trade.push(scripts[j]);
-							} else {
+							if (scripts[j].mode == 'predict') {
 								users[i].predict.push(scripts[j]);
 							}
 						}
@@ -45,6 +42,16 @@ class PredictUserTree extends Component {
 				})
 			})
 		})
+	}
+	componentWillReceiveProps(nextProps) {
+        $('.userPredictCircle').each(function(i) {
+            $(this).attr("class", "userPredictCircle fa fa-plus-circle collapsed");
+            $(this).parent().removeClass('open');
+        })
+		this.beforeRender();
+	}
+	componentWillMount() {
+		this.beforeRender();
 	}
 	mouseOut(username) {
 		$('#name_predict_' + username).css('color', '#808080');
@@ -78,6 +85,7 @@ class PredictUserTree extends Component {
 		let user_list = this.state.users.map((x, index) => {
 			return (
 				<div key={index}>
+				{localStorage.getItem("username") == 'admin'?
 				<div className='listback' id={'list_predict_' + x.username}
              onMouseOut={(e)=>this.mouseOut(x.username)}
              onMouseOver={(e)=>this.mouseOver(x.username)}
@@ -90,8 +98,10 @@ class PredictUserTree extends Component {
 		            &nbsp;
 		         	{x.predict.length}
 		       </span>
-		       </div>
-		         <div  style={{width:'100%'}} id={'scripts_predict_' + x.username} className="userPredictMenu collapse">
+		       </div>:null}
+		         <div  style={{width:'100%'}} id={'scripts_predict_' + x.username} 
+		         className={localStorage.getItem("username") == 'admin'?"userPredictMenu collapse":"userPredictMenu collapse in"}
+		         >
 		             <PredictList predict={x.predict} username={x.username} />
                  </div>
              </div>
@@ -106,7 +116,7 @@ class PredictUserTree extends Component {
 }
 const mapStateToProps = (state) => {
 	return {
-
+         update: state.reduUpdateClass,
 	};
 }
 

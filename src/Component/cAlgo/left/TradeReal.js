@@ -1,7 +1,21 @@
-import React, {Component} from 'react'
-import {connect} from 'react-redux'
+import React, {
+    Component
+} from 'react'
+import {
+    connect
+} from 'react-redux'
 import ChooseTime from './ChooseTime'
-import {alertMessage,saveToChooseDate,saveToChoose,confrimMessage,showLog,showCode,ShowList,saveStrategyList} from '../../../Redux/Action/Action'
+import {
+    alertMessage,
+    saveToChooseDate,
+    saveToChoose,
+    confrimMessage,
+    showLog,
+    showCode,
+    ShowList,
+    saveStrategyList,
+    updateClass
+} from '../../../Redux/Action/Action'
 import {
     getStra,
     exchangeGetStra,
@@ -20,7 +34,7 @@ import {
     getPre,
     sortNianhua,
     getStrategys,
-    model_type
+    model_type,
 } from '../../../Redux/Action/shareAction'
 import HisProfit from './HisProfit'
 import $ from 'jquery'
@@ -30,7 +44,7 @@ var TodoList = React.createClass({
     getInitialState: function() {
         return {
             todolist: [],
-            _id:''
+            _id: ''
         };
     },
     beforeRender: function(strategyList) {
@@ -61,9 +75,9 @@ var TodoList = React.createClass({
             strategyList[i].icon2 = strategyList[i].nianhua > 0 ? 'glyphicon glyphicon-arrow-up' : 'glyphicon glyphicon-arrow-down';
             if (typeof(strategyList[i].file_info) != 'object') {
                 strategyList[i].file_info = JSON.parse(strategyList[i].file_info);
-            }            
+            }
             strategyList[i].model_info = Object.assign(strategyList[i].file_info.string_data, strategyList[i].file_info.int_data);
-             strategyList[i].model_type = model_type(strategyList[i].file_info.model_type);
+            strategyList[i].model_type = model_type(strategyList[i].file_info.model_type);
 
         }
         this.setState({
@@ -72,7 +86,7 @@ var TodoList = React.createClass({
     },
     componentWillReceiveProps: function(getProp) {
         // setTimeout(()=>{
-            this.beforeRender(getProp.StrategyList);
+        this.beforeRender(getProp.StrategyList);
         // },0)
         clearInterval(this.tradeTimer);
         this.tradeTimer = setInterval(() => {
@@ -89,7 +103,7 @@ var TodoList = React.createClass({
         this.tradeTimer && clearTimeout(this.tradeTimer);
         clearInterval(this.tradeTimer);
     },
-    undatelist:function(strategyList){
+    undatelist: function(strategyList) {
         strategyList = statusToChinese(strategyList);
         this.setState({
             todolist: strategyList,
@@ -97,7 +111,7 @@ var TodoList = React.createClass({
     },
     render: function() {
         return (
-                 <ListTodo todo={this.state.todolist} exchange={this.props.exchange} Refresh={this.undatelist}/>
+            <ListTodo todo={this.state.todolist} exchange={this.props.exchange} Refresh={this.undatelist}/>
         );
     }
 });
@@ -106,9 +120,9 @@ var ListTodo = React.createClass({
     getInitialState: function() {
         return {
             delName: '',
-            delId:'',
-            actionType:'',
-            clickId:''
+            delId: '',
+            actionType: '',
+            clickId: ''
         };
     },
     onClick: function(chooseStrategy) {
@@ -124,11 +138,11 @@ var ListTodo = React.createClass({
         }
         this.props.Refresh(data);
     },
-    Del: function(id){
+    Del: function(id) {
         let data = this.props.todo;
         for (let i = 0; i < data.length; i++) {
             if (data[i].id == id) {
-                data.splice(i,1);
+                data.splice(i, 1);
                 break;
             }
         }
@@ -139,14 +153,14 @@ var ListTodo = React.createClass({
             if (delStrategy(true, this.state.delId)) {
                 // this.Del(this.state.delId);
                 // getStrategys();
-                getStrategys().then((data)=>{
-                                    _dispatch(saveStrategyList(getAllStrategy(true), false));
-                $('.staMenu').each(function(i) {
-                    $(this).removeClass('in');
-                })
-                $('.staCircle').each(function(i) {
-                    $(this).attr("class", "fa fa-plus-circle collapsed staCircle");
-                })
+                getStrategys().then((data) => {
+                    _dispatch(updateClass());
+                    $('.staMenu').each(function(i) {
+                        $(this).removeClass('in');
+                    })
+                    $('.staCircle').each(function(i) {
+                        $(this).attr("class", "fa fa-plus-circle collapsed staCircle");
+                    })
                 })
 
                 // this.refresh(this.state.delId, -2);
@@ -156,23 +170,23 @@ var ListTodo = React.createClass({
         } else {
             if (strategyAction(true, this.state.delId, 4)) {
                 // this.Del(this.state.delId);
-                setTimeout(()=>{
+                setTimeout(() => {
                     // getStrategys();
-                    getStrategys().then((data)=>{
-                    _dispatch(saveStrategyList(getAllStrategy(true), false));
-                })
-                },100)
+                    getStrategys().then((data) => {
+                        _dispatch(updateClass());
+                    })
+                }, 100)
             } else {
-                _dispatch(alertMessage('操作失败',1000));
+                _dispatch(alertMessage('操作失败', 1000));
             }
         }
     },
-    del: function(id,name) {
+    del: function(id, name) {
         this.setState({
-            delName: '永久删除 '+name,
+            delName: '永久删除 ' + name,
             delId: id,
-            chartNum:'',
-            actionType:'del'
+            chartNum: '',
+            actionType: 'del'
         })
     },
     start: function(id) {
@@ -191,16 +205,16 @@ var ListTodo = React.createClass({
             _dispatch(alertMessage('暂停失败', 1000));
         }
     },
-    componentDidMount : function(){
+    componentDidMount: function() {
 
     },
-    showLogs: function(id,name){
-        _dispatch(showLog(id,name));
+    showLogs: function(id, name) {
+        _dispatch(showLog(id, name));
     },
     show: function(id, e) {
         let oldClass = e.target.className;
         $('.staMenu').each(function(index, el) {
-            if(id!==el.id){
+            if (id !== el.id) {
                 $(this).removeClass('in');
             }
         });
@@ -214,7 +228,7 @@ var ListTodo = React.createClass({
             e.target.className = 'fa fa-plus-circle collapsed staCircle';
         }
     },
-    showCode:function(id){
+    showCode: function(id) {
         _dispatch(showCode(id));
         _dispatch(ShowList('code'));
     },
@@ -226,11 +240,13 @@ var ListTodo = React.createClass({
         })
     },
     showError: function(error) {
-        if (error != '' && error!=null) {
+        if (error != '' && error != null) {
             _dispatch(alertMessage(error));
+        } else {
+            _dispatch(alertMessage('没有错误信息',2000));
         }
     },
-    showChart(id,e){
+    showChart(id, e) {
         let flag = $(e.target).parent().hasClass('open');
         $('.liStyle2').each(function(index, el) {
             $(this).removeClass('open');
@@ -251,10 +267,10 @@ var ListTodo = React.createClass({
         }
         const modalStyle = {
             top: '10%',
-            left: document.body.clientWidth>900?document.body.clientWidth / 2 - 200:'0',
+            left: document.body.clientWidth > 900 ? document.body.clientWidth / 2 - 200 : '0',
             right: 'auto',
             bottom: 'auto',
-            width:document.body.clientWidth>900?400:'100%'
+            width: document.body.clientWidth > 900 ? 400 : '100%'
         }
         const chart = {
                 backgroundColor: '#525252',
@@ -274,9 +290,9 @@ var ListTodo = React.createClass({
             // position:'relative',
             // zIndex:'9999',
         var o = this;
-        let modalId = this.props.todo.length>0 ?this.props.todo[0].id:'';
+        let modalId = this.props.todo.length > 0 ? this.props.todo[0].id : '';
         return (
-   <div style={{marginTop:'-5px'}}>
+            <div style={{marginTop:'-5px'}}>
             {this.props.todo.length>0?<i className='real smallfont' style={{marginLeft:'15px'}}>实盘模拟</i>:null}
             <ul style={{overflow:'hidden',padding:0}}>
             {
@@ -456,9 +472,9 @@ class TradeReal extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            StrategyList:[],
+            StrategyList: [],
         };
-    }   
+    }
     componentWillReceiveProps(getProp) {
         // this.setState({
         //     exchange: getProp.exchange,

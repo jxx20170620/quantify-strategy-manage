@@ -1,7 +1,23 @@
-import React, {Component} from 'react'
-import {connect} from 'react-redux'
+import React, {
+    Component
+} from 'react'
+import {
+    connect
+} from 'react-redux'
 import ChooseTime from './ChooseTime'
-import {alertMessage,showPredictChart,showPredictRecord,saveToChooseDate,saveToChoose,confrimMessage,showLog,showCode,ShowList,saveStrategyList} from '../../../Redux/Action/Action'
+import {
+    alertMessage,
+    showPredictChart,
+    showPredictRecord,
+    saveToChooseDate,
+    saveToChoose,
+    confrimMessage,
+    showLog,
+    showCode,
+    ShowList,
+    saveStrategyList,
+    updateClass
+} from '../../../Redux/Action/Action'
 import {
     getStra,
     exchangeGetStra,
@@ -26,19 +42,19 @@ import {
 import $ from 'jquery'
 let _dispatch;
 let Prop;
-let flag=false;
+let flag = false;
 let TodoList = React.createClass({
     getInitialState: function() {
         return {
             todolist: [],
-            _id:''
+            _id: ''
         };
     },
     beforeRender: function(strategyList) {
         strategyList = statusToChinese(strategyList);
         for (let i = 0; i < strategyList.length; i++) {
             let DateList = getDateList(strategyList[i].id);
-            strategyList[i].endTime = DateList.length>0 ? DateList[DateList.length - 1] : '';
+            strategyList[i].endTime = DateList.length > 0 ? DateList[DateList.length - 1] : '';
             strategyList[i].makeData = [];
             strategyList[i].accuracy = null;
             strategyList[i].script_name = getClassName(strategyList[i].script_id).name;
@@ -46,7 +62,7 @@ let TodoList = React.createClass({
             if (typeof(strategyList[i].file_info) != 'object') {
                 strategyList[i].file_info = JSON.parse(strategyList[i].file_info);
             }
-            strategyList[i].model_info = Object.assign(strategyList[i].file_info.string_data,strategyList[i].file_info.int_data);
+            strategyList[i].model_info = Object.assign(strategyList[i].file_info.string_data, strategyList[i].file_info.int_data);
             strategyList[i].model_type = model_type(strategyList[i].file_info.model_type);
         }
 
@@ -55,13 +71,12 @@ let TodoList = React.createClass({
             todolist: sortPredict(strategyList),
         })
     },
-                                // let jquery_jd = todolist[i].id + '_accuracy';
-                            // $('#' + jquery_jd).text(todolist[i].accuracy + '%');
+    // let jquery_jd = todolist[i].id + '_accuracy';
+    // $('#' + jquery_jd).text(todolist[i].accuracy + '%');
     componentDidUpdate: function() {
         if (!flag) {
             return;
         }
-
         this.getData().then((data) => {
             flag = false;
             this.setState({
@@ -74,7 +89,7 @@ let TodoList = React.createClass({
     },
     componentWillReceiveProps: function(getProp) {
         // setTimeout(()=>{
-            this.beforeRender(getProp.StrategyList);
+        this.beforeRender(getProp.StrategyList);
         // },0)
         clearInterval(this.predictTimer);
         this.predictTimer = setInterval(() => {
@@ -88,30 +103,31 @@ let TodoList = React.createClass({
     getData: function(i) {
         return new Promise((resolve, reject) => {
             let todolist = this.state.todolist
-            for (let i in todolist) {
-                getPredict(todolist[i].id, todolist[i].endTime).then((data) => {
-                    for (let j in data[data.length - 1]) {
-                        if (j == 'accuracy') {
-                            todolist[i].accuracy = Number(data[data.length - 1][j] * 100).toFixed(2);
-                        }
-                    }
-                    if (i == todolist.length - 1) {
-                        resolve(todolist);
-                    }
-                })
+            resolve(todolist);
+            // for (let i in todolist) {
+            //     getPredict(todolist[i].id, todolist[i].endTime).then((data) => {
+            //         for (let j in data[data.length - 1]) {
+            //             if (j == 'accuracy') {
+            //                 todolist[i].accuracy = Number(data[data.length - 1][j] * 100).toFixed(2);
+            //             }
+            //         }
+            //         if (i == todolist.length - 1) {
+            //             resolve(todolist);
+            //         }
+            //     })
 
-            }
+            // }
         });
     },
-    undatelist:function(strategyList){
+    undatelist: function(strategyList) {
         strategyList = statusToChinese(strategyList);
         this.setState({
             todolist: strategyList,
         })
     },
-    render: function() { 
+    render: function() {
         return (
-                 <ListTodo todo={this.state.todolist} exchange={this.props.exchange} Refresh={this.undatelist}/>
+            <ListTodo todo={this.state.todolist} exchange={this.props.exchange} Refresh={this.undatelist}/>
         );
     }
 });
@@ -120,9 +136,9 @@ let ListTodo = React.createClass({
     getInitialState: function() {
         return {
             delName: '',
-            delId:'',
-            actionType:'',
-            clickId:''
+            delId: '',
+            actionType: '',
+            clickId: ''
         };
     },
     refresh: function(id, flag) {
@@ -135,11 +151,11 @@ let ListTodo = React.createClass({
         }
         this.props.Refresh(data);
     },
-    Del: function(id){
+    Del: function(id) {
         let data = this.props.todo;
         for (let i = 0; i < data.length; i++) {
             if (data[i].id == id) {
-                data.splice(i,1);
+                data.splice(i, 1);
                 break;
             }
         }
@@ -148,41 +164,37 @@ let ListTodo = React.createClass({
     actionOk: function() {
         if (this.state.actionType == 'del') {
             if (delStrategy(true, this.state.delId)) {
-                // this.Del(this.state.delId);
-                // getStrategys();
-                getStrategys().then((data)=>{
-                _dispatch(saveStrategyList(getAllStrategy(true), false));
-            })
+                getStrategys().then((data) => {
+                    _dispatch(updateClass());
+                })
                 $('.staMenu').each(function(i) {
                     $(this).removeClass('in');
                 })
                 $('.staCircle').each(function(i) {
-                    $(this).attr("class", "fa fa-plus-circle collapsed staCircle");
-                })
-                // this.refresh(this.state.delId, -2);
+                        $(this).attr("class", "fa fa-plus-circle collapsed staCircle");
+                    })
             } else {
                 _dispatch(alertMessage('删除失败', 1000));
             }
         } else {
             if (strategyAction(true, this.state.delId, 4)) {
                 this.Del(this.state.delId);
-                setTimeout(()=>{
-                    // getStrategys();
-                    getStrategys().then((data)=>{
-                    _dispatch(saveStrategyList(getAllStrategy(true), false));
-                })
-                },100)
+                setTimeout(() => {
+                    getStrategys().then((data) => {
+                        _dispatch(updateClass());
+                    })
+                }, 100)
             } else {
                 _dispatch(alertMessage('操作失败', 1000));
             }
         }
     },
-    del: function(id,name) {
+    del: function(id, name) {
         this.setState({
-            delName: '永久删除 '+name,
+            delName: '永久删除 ' + name,
             delId: id,
-            chartNum:'',
-            actionType:'del'
+            chartNum: '',
+            actionType: 'del'
         })
     },
     start: function(id) {
@@ -201,14 +213,14 @@ let ListTodo = React.createClass({
             _dispatch(alertMessage('暂停失败', 1000));
         }
     },
-    componentDidMount : function(){
+    componentDidMount: function() {
 
     },
-    showLogs: function(id,name){
-        _dispatch(showLog(id,name));
+    showLogs: function(id, name) {
+        _dispatch(showLog(id, name));
     },
-    showPredictRecord:function(id,name,script_id){
-        _dispatch(showPredictRecord(id,name,script_id));
+    showPredictRecord: function(id, name, script_id) {
+        _dispatch(showPredictRecord(id, name, script_id));
     },
     showChart: function(id, name, script_id) {
         _dispatch(showPredictChart(id, name, script_id));
@@ -216,7 +228,7 @@ let ListTodo = React.createClass({
     show: function(id, e) {
         let oldClass = e.target.className;
         $('.staMenu').each(function(index, el) {
-            if(id!==el.id){
+            if (id !== el.id) {
                 $(this).removeClass('in');
             }
         });
@@ -229,7 +241,7 @@ let ListTodo = React.createClass({
             e.target.className = 'fa fa-plus-circle collapsed staCircle';
         }
     },
-    showCode:function(id){
+    showCode: function(id) {
         _dispatch(showCode(id));
         _dispatch(ShowList('code'));
     },
@@ -241,10 +253,10 @@ let ListTodo = React.createClass({
         })
     },
     showError: function(error) {
-        if (error != '' && error!=null) {
+        if (error != '' && error != null) {
             _dispatch(alertMessage(error));
-        }else{
-            _dispatch(alertMessage('没有错误信息'));
+        } else {
+            _dispatch(alertMessage('没有错误信息',2000));
         }
     },
     render: function() {
@@ -274,17 +286,17 @@ let ListTodo = React.createClass({
         }
         const boderStyle1 = {
             border: '1px solid #666',
-            width:'35%%'
+            width: '35%%'
         }
         const boderStyle2 = {
             border: '1px solid #666',
-            width:'65%'
+            width: '65%'
         }
         let o = this;
-        let flag = Prop.username!=undefined?Prop.username:Prop.exchange;
-        let modalId = flag  + 'del_real_sta';
+        // let flag = Prop.username != undefined ? Prop.username : Prop.exchange;
+        let modalId = this.props.todo.length > 0 ? this.props.todo[0].id : '';
         return (
-       <div style={{marginTop:'0px'}}>
+            <div style={{marginTop:'0px'}}>
             {this.props.todo.length>0?<i className='predict smallfont' style={{marginLeft:'15px',}}>实盘预测</i>:null}
             <ul style={{overflow:'hidden',padding:0}}>
             {
@@ -478,9 +490,9 @@ class PredictReal extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            StrategyList:[],
+            StrategyList: [],
         };
-    }   
+    }
     componentWillReceiveProps(getProp) {
         // this.setState({
         //     StrategyList: getProp.StrategyList

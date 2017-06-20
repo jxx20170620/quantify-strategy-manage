@@ -52,6 +52,15 @@ class About extends Component{
 								<div className="information"></div>
 								<div className="information"></div>*/}
 								{/*ul>li*5*/}
+								<div className="date">2017-06-05</div>
+								<ul>
+									<li>行情图信息 最新成交价成交量 选择的实例信息放入曲线图中</li>
+									<li>导出报告移至菜单栏中的交易系统</li>
+									<li>整合交易策略、交易产品、预测服务、预测产品tab</li>
+									<li>行情数据按照时间区间下载</li>
+									<li>非管理员获取手续费</li>
+									<li>行情图样式</li>
+								</ul>
 								<div className="date">2017-05-10</div>
 								<ul>
 									<li>交易产品中 交易合约分类之后加一层作者分类，实例列表按作者分类显示，点击用户分类 关闭其他用户展开，用户点击一次加载实例列表 第二次不加载 直接显示</li>

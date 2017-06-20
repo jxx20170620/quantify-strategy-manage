@@ -42,7 +42,8 @@ import {
   getDay,
   getBrowser,
   getStatic,
-  downMarket
+  downMarket,
+  strDateTime
 } from '../../../Redux/Action/shareAction'
 let _THIS;
 const conStyle = {
@@ -85,9 +86,17 @@ class MarketChart extends Component {
     e.preventDefault();
     let start_date = $('#start_date').val();
     let end_date = $('#end_date').val();
+    if (strDateTime(start_date) || strDateTime(end_date)) {
+      this.props.dispatch(alertMessage('日期格式错误', 2000));
+      return;
+    }
     let exchange = this.state.exchange;
     let symbol = $('#market_symbol').val();
     downMarket(exchange, symbol, start_date, end_date).then((data) => {
+        if (data.length == 0) {
+          this.props.dispatch(alertMessage('该日期区间没有行情数据', 2000));
+          return;
+        }
         let text;
         text = "datetime,open,high,low,close,volume";
         for (let i = 0; i < data.length; i++) {
@@ -101,6 +110,8 @@ class MarketChart extends Component {
         }
         let name = exchange + '_' + symbol + '_' + start_date + '_' + end_date + '_' + Math.round(new Date().getTime());
         downFile(text, name + '.csv');
+      }, (message) => {
+        this.props.dispatch(alertMessage(message));
       })
       // return;
   }
@@ -194,6 +205,7 @@ class MarketChart extends Component {
 
     let newClose = data.length > 0 ? data[data.length - 1].close : 0;
     let newVolume = data.length > 0 ? data[data.length - 1].volume : 0;
+    let newDatetime = data.length > 0 ? formatDate(data[data.length - 1].datetime).slice(11,19) : 0;
     let marketDetail = {
       exchange: exchange,
       symbol: symbol,
@@ -216,22 +228,14 @@ class MarketChart extends Component {
           count: 10,
           text: '10m'
         }, {
-          type: 'minute',
-          count: 30,
-          text: '30m'
-        }, {
           type: 'hour',
           count: 1,
           text: '1h'
         }, {
-          type: 'hour',
-          count: 2,
-          text: '2h'
-        }, {
           type: 'all',
           text: '所有'
         }],
-        selected: 4,
+        selected: 2,
         inputEnabled: false,
         inputBoxWidth: 40,
         inputBoxHeight: 18,
@@ -253,7 +257,7 @@ class MarketChart extends Component {
       title: {
         align: 'center',
         useHTML: true,
-        text: document.body.clientWidth > 900 ? exchange + ' ' + symbol + ' ' + start + "  <span class='chart_title'>" + newClose + ',' + newVolume + "</span>" : null,
+        text: document.body.clientWidth > 900 ?  exchange + ' ' + symbol + ' ' + start + "<span class='chart_title_date'>"+ newDatetime +"</span>"+ "<span id='new_close' class='chart_title'>" + newClose + ',' + newVolume +"</span>" : null,
         style: {
           fontWeight: 'bold',
           fontSize: '20px'
@@ -330,7 +334,7 @@ class MarketChart extends Component {
         title: {
           // text: '价格'
         },
-        top: '-10%',
+        top: '-15%',
         height: '70%',
         opposite: false,
         tickPixelInterval: 50,
@@ -342,8 +346,9 @@ class MarketChart extends Component {
           align: 'left',
           x: -5
         },
-        top: '60%',
-        height: '10%',
+        tickPixelInterval: 50,
+        top: '45%',
+        height: '15%',
         gridLineWidth: '0px',
         tickWidth: 0,
       }, {
@@ -355,11 +360,11 @@ class MarketChart extends Component {
         title: {
           text: null
         },
-        top: '70%',
-        height: '30%',
+        top: '60%',
+        height: '40%',
         offset: 0,
         opposite: false,
-        tickPixelInterval: 10,
+        tickPixelInterval: 50,
         gridLineWidth: '0.1px',
         tickWidth: 0,
       }],
@@ -500,14 +505,14 @@ class MarketChart extends Component {
           data: volume,
           showInLegend: false,
           yAxis: 1,
-          // pointWidth: 1
+          pointWidth: 2
         }, {
           type: 'spline',
           name: 'MA5',
           color: '#fff',
           data: qualification.EMA5,
-          visible: false,
-          lineWidth: 2,
+          visible: true,
+          lineWidth: 1,
           dataGrouping: {
             enabled: false
           },
@@ -520,8 +525,8 @@ class MarketChart extends Component {
           name: 'MA10',
           color: '#e9df21',
           data: qualification.EMA10,
-          lineWidth: 2,
-          visible: false,
+          lineWidth: 1,
+          visible: true,
           dataGrouping: {
             enabled: false
           },
@@ -534,8 +539,8 @@ class MarketChart extends Component {
           name: 'MA30',
           color: '#910000',
           data: qualification.EMA30,
-          lineWidth: 2,
-          visible: false,
+          lineWidth: 1,
+          visible: true,
           dataGrouping: {
             enabled: false
           },
@@ -549,8 +554,8 @@ class MarketChart extends Component {
           color: '#1aadce',
           border: 0,
           data: qualification.EMA60,
-          visible: false,
-          lineWidth: 2,
+          visible: true,
+          lineWidth: 1,
           dataGrouping: {
             enabled: false
           },
@@ -787,15 +792,11 @@ class MarketChart extends Component {
         var columPoint = chart.series[1].points[i];
         // console.log(columPoint)
         if (candlePoint.open != undefined && candlePoint.close != undefined) { //如果是K线图 改变矩形条颜色，否则不变  
-          var color = (candlePoint.open < candlePoint.close) ? '#DD2200' : '#33AA11';
+          // var color = (candlePoint.open < candlePoint.close) ? '#DD2200' : '#33AA11';
+          var color = (candlePoint.open < candlePoint.close) ? '#aab061' : '#3db8b8';
           columPoint.color = color;
-        } else {
-          // var seriesPointAttr = merge(series.pointAttr);
-        }
-
-        // points[i].pointAttr = seriesPointAttr;
+        } else {}
       }
-
       originalDrawPoints.call(this);
     }
     exporting(Highcharts);
@@ -813,13 +814,23 @@ class MarketChart extends Component {
       }
     });
     $("#markert_chart").css('width', $("#rightCenter").width() - 10);
-    $("#markert_chart").css('height', $("#rigtCenter").height() - 40);
-    Highcharts.StockChart('markert_chart', config);
+    $("#markert_chart").css('height', $("#rightCenter").height() - 40);
+    localStorage.setItem("chart_width", $("#rightCenter").width() - 10);
+    localStorage.setItem("chart_height", $("#rightCenter").height() - 40);
+
+
+
+  Highcharts.StockChart('markert_chart', config);
+
 
   }
 
   // clearInterval(this.timer);
   componentWillReceiveProps(getProp) {
+    if (getProp.type == 'id') {
+      this.makeChart(false);
+      return;
+    }
     if (getProp.choosedate == undefined) {
       if (getProp.type != 'id') {
         return;
@@ -861,14 +872,21 @@ class MarketChart extends Component {
       setTimeout(() => {
         this.makeChart(false);
       }, 300)
-
     })
-    $('#start_date').val('2017-05-25');
-    $('#end_date').val('2017-05-26');
+    $('#start_date').val(start);
+    $('#end_date').val(start);
+
+    // this.timer = setInterval(() => {
+      // $('.chart_title').css('color', '#33AA11');
+      // $('.chart_title').css('color','#DD2200');
+    // }, 1000);
+
   }
   componentDidUpdate() {
-    $('#start_date').val('2017-05-25');
-    $('#end_date').val('2017-05-26');
+    $('#start_date').val(start);
+    $('#end_date').val(start);
+    // $('.chart_title').css('color','#33AA11');
+    // $('.chart_title').css('color','#DD2200');
   }
   componentWillUnmount() {
     this.timer && clearTimeout(this.timer);
@@ -885,7 +903,13 @@ class MarketChart extends Component {
       exchange: e.target.value
     })
   }
-
+  checkDate(e) {
+    if (strDateTime(e.target.value)) {
+      $(e.target).css('border', '1px solid #ff0000');
+    } else {
+      $(e.target).css('border', '0px solid');
+    }
+  }
   render() {
     const modalBody = {
       color: '#fff',
@@ -1047,10 +1071,12 @@ class MarketChart extends Component {
             </Switch>
                      </div>
                     <div className="form-group">
-                       <input type='text'  required="required" style={input_style} id="start_date" placeholder='开始时间(例:2017-06-01)'></input>
+                       <input type='text'  required="required" style={input_style} id="start_date" placeholder='开始时间(YYYY-MM-DD)'
+                       onChange={(e)=>this.checkDate(e)}></input>
                     </div>
                     <div className="form-group">
-                       <input type='text'  required="required" style={input_style} id="end_date" placeholder='结束时间(例:2017-06-02)'></input>
+                       <input type='text'  required="required" style={input_style} id="end_date" placeholder='结束时间(YYYY-MM-DD)'
+                       onChange={(e)=>this.checkDate(e)}></input>
                    </div>
               </div>
               <div className="modal-footer" style={{borderTop:'0px solid #525252',marginTop:'-10px'}}>

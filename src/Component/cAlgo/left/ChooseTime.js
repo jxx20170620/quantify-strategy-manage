@@ -96,9 +96,19 @@ class ChooseTime extends Component {
 			date: chooseDate
 		};
 		this.props.dispatch(showDataTitle(title));
-		setTimeout(() => {
-			
-		}, 1000);
+		$('#MarketChart').removeClass('active');
+		$('#RunChart').addClass('active');
+		$(".rightTable a").each(function(index, el) {
+			if (index == 1) {
+				$(this).css('backgroundColor', '#525252');
+			} else {
+				$(this).css('backgroundColor', '#292929');
+			}
+
+		});
+		// setTimeout(() => {
+
+		// }, 1000);
 	}
 	handleGenderChange(event) {
 		let value = event.target.value;

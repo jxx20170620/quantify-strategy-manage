@@ -45,8 +45,7 @@ class ProfitChart extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-    };
+    this.state = {};
   }
 
 
@@ -64,13 +63,13 @@ class ProfitChart extends Component {
 
       if (alldata2[i].direction == '看多') {
         chartArr1.push({
-          "text": '方向：看多<br>开仓价：￥' + alldata2[i].openprice + '<br>平仓价：￥' + alldata2[i].closeprice + '<br>手续费：' + alldata2[i].test + '<br/>收益率：' + countYeild +'%',
+          "text": '方向：看多<br>开仓价：￥' + alldata2[i].openprice + '<br>平仓价：￥' + alldata2[i].closeprice + '<br>手续费：' + alldata2[i].test + '<br/>收益率：' + countYeild + '%',
           "title": "看多",
           "x": alldata2[i].closetime,
         })
       } else {
         chartArr2.push({
-          "text": '方向：看空<br>开仓价：￥' + alldata2[i].openprice + '<br>平仓价：￥' + alldata2[i].closeprice + '<br>手续费：' + alldata2[i].test + '<br/>收益率：' + countYeild+'%',
+          "text": '方向：看空<br>开仓价：￥' + alldata2[i].openprice + '<br>平仓价：￥' + alldata2[i].closeprice + '<br>手续费：' + alldata2[i].test + '<br/>收益率：' + countYeild + '%',
           "title": "看空",
           "x": alldata2[i].closetime,
         })
@@ -80,7 +79,7 @@ class ProfitChart extends Component {
 
     let config = {
       chart: {
-        backgroundColor:'#000',
+        backgroundColor: '#000',
         panning: false
       },
       credits: {
@@ -160,11 +159,11 @@ class ProfitChart extends Component {
       },
       scrollbar: {
         enabled: true,
-        height:0
+        height: 0
       },
       navigator: {
         enabled: true,
-        height:20
+        height: 20
       },
       yAxis: {
         labels: {
@@ -188,7 +187,7 @@ class ProfitChart extends Component {
       title: {
         // text: '收益曲线图',
         style: {
-          fontSize:'10px'
+          fontSize: '10px'
         }
       },
       xAxis: {
@@ -200,7 +199,7 @@ class ProfitChart extends Component {
           // selected: 3,
           // inputEnabled:false
       },
-            plotOptions: {
+      plotOptions: {
         series: {
           marker: {
             enabled: false
@@ -212,13 +211,12 @@ class ProfitChart extends Component {
         name: '收益率',
         data: chartData,
         id: 'profit',
-        color:'#ff0000',
+        color: '#ff0000',
         lineWidth: 1,
         dataGrouping: {
           enabled: false
         }
-      },
-      {
+      }, {
         type: 'flags',
         data: chartArr1,
         onSeries: "profit",
@@ -231,8 +229,7 @@ class ProfitChart extends Component {
         },
         y: -40,
         name: '看多',
-      },
-      {
+      }, {
         type: 'flags',
         data: chartArr2,
         onSeries: "profit",
@@ -247,20 +244,26 @@ class ProfitChart extends Component {
         name: '看空',
       }]
     };
-        Highcharts.setOptions({
+    Highcharts.setOptions({
       global: {
         useUTC: false
       }
     });
-        $("#profit_chart").css('width', $("#rightCenter").width()-10);
-        $("#profit_chart").css('height', $("#rightCenter").height()-40);
-        Highcharts.StockChart('profit_chart',config);
+    $("#profit_chart").css('width', $("#rightCenter").width() - 10);
+    $("#profit_chart").css('height', $("#rightCenter").height() - 40);
+    Highcharts.StockChart('profit_chart', config);
   }
   componentWillReceiveProps(getProp) {
-  
-    if (getProp.choosedate == '') {
-      this.makeChart([]);
-      return;
+    if (getProp.type == 'id') {
+        this.makeChart(alldata2);
+        return;
+    }
+    if (getProp.choosedate == undefined) {
+      if (getProp.type != 'id') {
+        return;
+      }
+        this.makeChart(alldata2);
+        return;
     }
     let sdate = getProp.choosedate;
     let edate = getNextDay(sdate);
@@ -268,7 +271,7 @@ class ProfitChart extends Component {
     // let data = getTransaction(chooseid, sdate, edate);
     let data = getStatic().transitions.slice(0);
     let dataList = makeData(chooseid, data);
-      
+
     let newData = dataList.newData;
     if (newData.length == 0) {
       $('#profit_chart').empty();
@@ -277,7 +280,7 @@ class ProfitChart extends Component {
     alldata2 = newData;
 
     this.makeChart(alldata2);
-              
+
   }
   componentDidMount() {
     window.addEventListener('resize', () => {

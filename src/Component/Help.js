@@ -1,42 +1,36 @@
-import React, {Component} from 'react'
+import React, {
+	Component
+} from 'react'
 import $ from 'jquery'
-import {connect} from 'react-redux'
+import {
+	connect
+} from 'react-redux'
 import '../Style/Help.css'
 
 class Help extends Component {
-	componentWillMount(){
-		
-	}
-	componentDidMount() {
-		
-	}
-	componentWillUnmount() {
-		
-	}
-    handleClick(e){
-		 $("#menu a").each(function(index){
-            $(this).removeClass("active");                                    
-            })
-		 e.target.className="list-group-item active";
-	}
-	top(){
+
+
+	top() {
 		var timer = null;
-        cancelAnimationFrame(timer);
-        timer = requestAnimationFrame(function fn(){
-            var oTop = $('.help_right').scrollTop();
-            if(oTop > 0){
-                $('.help_right').scrollTop(oTop - 250);
-                timer = requestAnimationFrame(fn);
-            }else{
-                cancelAnimationFrame(timer);
-            }
-        });
-    
+		cancelAnimationFrame(timer);
+		timer = requestAnimationFrame(function fn() {
+			var oTop = $('.help_right').scrollTop();
+			if (oTop > 0) {
+				$('.help_right').scrollTop(oTop - 250);
+				timer = requestAnimationFrame(fn);
+			} else {
+				cancelAnimationFrame(timer);
+			}
+		});
+
 	}
-	
+	goTip = (event) => {
+		return false;
+		// event.stopPropagation();
+	}
 	render() {
 		return (
-	    <div>
+			<div>
 		    <div style={{width:"100%",height:'62px',backgroundColor:'black'}}>			   
 			    <img src={require("../../src/images/logo.png")} style={{width:'70px',margin: "-5px 0 0 1.5em"}}/>			    
 		    </div>
@@ -45,24 +39,24 @@ class Help extends Component {
 	        		<div id='navbarExample' className='navbar navbar-static'>
 	        	    <div className="navbar-inner">
 			        	<ul className='nav'>
-			        		<li className='active indent1'><a href='#zijin'>紫金量化</a></li>
-			        		<li className='indent2'><a href='#productSupport'>紫金量化支持哪些交易品种？</a></li>
-			        		<li className='indent2'><a href='#server'>紫金量化提供哪些服务？</a></li>
-			        		<li className='indent1'><a href='#tradeStrategy'>交易策略</a></li>
-			        		<li className='indent2'><a href='#exitTradeStrategy'>如何编写“交易策略”？</a></li>
-			        		<li className='indent2'><a href='#addTradeStrategy'>如何添加“交易策略”？</a></li>
-			        		<li className='indent2'><a href='#histroy'>如何由交易策略代码创建历史回测？</a></li>
-			        		<li className='indent1'><a href='#product'>交易产品</a></li>
-			        		<li className='indent2'><a href='#createProduct'>如何创建“交易产品”？</a></li>
-			        		<li className='indent2'><a href='#read'>如何查看“交易产品”的交易情形？</a></li>
-			        		<li className='indent1'><a href='#predictCode'>预测代码</a></li>
-			        		<li className='indent2'><a href='#addPredictCode'>如何添加“预测代码”？</a></li>
-			        		<li className='indent1'><a href='#PredictService'>预测服务</a></li>
-			        		<li className='indent2'><a href='#createPredict'>如何创建“预测服务”？</a></li>
-			        		<li className='indent1'><a href='#other'>其他辅助功能</a></li>
-			        		<li className='indent2'><a href='#onLine'>在线编写“交易代码”和“预测代码”</a></li>
-			        		<li className='indent2'><a href='#codeTitel'>代码补全与提示</a></li>
-			        		<li className='indent2'><a href='#export'>导出交易报告</a></li>
+			        		<li className='active indent1'><a onClick={(e)=>this.goTip(e)} href='#zijin'>紫金量化</a></li>
+			        		<li className='indent2'><a onClick={(e)=>this.goTip(e)} href='#productSupport'>紫金量化支持哪些交易品种？</a></li>
+			        		<li className='indent2'><a onClick={(e)=>this.goTip(e)} href='#server'>紫金量化提供哪些服务？</a></li>
+			        		<li className='indent1'><a onClick={(e)=>this.goTip(e)} href='#tradeStrategy'>交易策略</a></li>
+			        		<li className='indent2'><a onClick={(e)=>this.goTip(e)} href='#exitTradeStrategy'>如何编写“交易策略”？</a></li>
+			        		<li className='indent2'><a onClick={(e)=>this.goTip(e)} href='#addTradeStrategy'>如何添加“交易策略”？</a></li>
+			        		<li className='indent2'><a onClick={(e)=>this.goTip(e)} href='#histroy'>如何由交易策略代码创建历史回测？</a></li>
+			        		<li className='indent1'><a onClick={(e)=>this.goTip(e)} href='#product'>交易产品</a></li>
+			        		<li className='indent2'><a onClick={(e)=>this.goTip(e)} href='#createProduct'>如何创建“交易产品”？</a></li>
+			        		<li className='indent2'><a onClick={(e)=>this.goTip(e)} href='#read'>如何查看“交易产品”的交易情形？</a></li>
+			        		<li className='indent1'><a onClick={(e)=>this.goTip(e)} href='#predictCode'>预测代码</a></li>
+			        		<li className='indent2'><a onClick={(e)=>this.goTip(e)} href='#addPredictCode'>如何添加“预测代码”？</a></li>
+			        		<li className='indent1'><a onClick={(e)=>this.goTip(e)} href='#PredictService'>预测服务</a></li>
+			        		<li className='indent2'><a onClick={(e)=>this.goTip(e)} href='#createPredict'>如何创建“预测服务”？</a></li>
+			        		<li className='indent1'><a onClick={(e)=>this.goTip(e)} href='#other'>其他辅助功能</a></li>
+			        		<li className='indent2'><a onClick={(e)=>this.goTip(e)} href='#onLine'>在线编写“交易代码”和“预测代码”</a></li>
+			        		<li className='indent2'><a onClick={(e)=>this.goTip(e)} href='#codeTitel'>代码补全与提示</a></li>
+			        		<li className='indent2'><a onClick={(e)=>this.goTip(e)} href='#export'>导出交易报告</a></li>
 			        	</ul>     	
 	                </div>
 	        		
@@ -71,14 +65,14 @@ class Help extends Component {
 	        	<div className="help_right scrollspy-example" data-spy='scroll' style={{height:document.documentElement.clientHeight-100}} data-target='#navbarExample' data-offset='70'>
 		        	
 		        	    <h2 id='zijin' className='helpTitle'>紫金量化</h2>
-		        	    <p>紫金量化 — 高效实用的量化策略平台</p>
+		        	    <span>紫金量化 — 高效实用的量化策略平台</span>
 		        	   
 		        	    <h4 id='productSupport' className='helpSubtitle'>紫金量化支持哪些交易品种？</h4>
-		        	    <p>目前平台开放的交易产品分为三类：CTP,CSRPME,OKCOIN</p>
+		        	    <span>目前平台开放的交易产品分为三类：CTP,CSRPME,OKCOIN</span>
 		        	    <h4 id='server' className='helpSubtitle'>紫金量化提供哪些服务？</h4>
-		        	    <p> 
+		        	    <span> 
 		        	    	<img src={require('../../src/images/menu.png')}/>
-		        	    	<p>紫金量化平台目前分成了五个模块。</p>
+		        	    	<span>紫金量化平台目前分成了五个模块。</span>
 		        	    	<ol className='indent3'>
 		        	    		<li >交易策略：在这里您可以上传自己编写好的交易策略代码（也可点击“新建代码”进行在线编写），并提供在线阅读代码的功能。</li>
 		        	    		<li>交易产品：在这里您可以看到自己创建的实例和实例信息（包括实例状态，创建时间等），启动策略交易后，您可以看到每个时刻的交易数据以及实时的年化收益率和交易胜率。通过选择交易的时间，可以查看实例的具体表现。</li>
@@ -86,16 +80,16 @@ class Help extends Component {
 		        	    		<li>预测服务：基于您的“预测代码”以及自定义预测算法的输出，您可以查看创建的预测服务和信息，启动策略交易后，可通过选择时间来查看预测算法结果的实时输出。</li>
 		        	    		<li>历史交易：在这里您可以查看到移至历史交易所有策略的详细信息。</li>
 		        	    	</ol>
-		        	    </p>
+		        	    </span>
 		        	    <hr className='dirves'/>
 		        	    <h2 id='tradeStrategy' className='helpTitle'>交易策略</h2>
-		        	    <p>基于您上传的交易策略代码，可以创建策略的实例（包含“实盘模拟”，“历史回测”，“真实交易”）。
+		        	    <span>基于您上传的交易策略代码，可以创建策略的实例（包含“实盘模拟”，“历史回测”，“真实交易”）。
 			        	    <div>
 			        	    	<img src={require('../../src/images/createExample.png')} className='img_br'/>
 			        	    </div>
-		        	    </p>
+		        	    </span>
 		        	    <h4 id='exitTradeStrategy' className='helpSubtitle'>如何编写“交易策略”？</h4>
-		        	    <p>
+		        	    <span>
 		        	    	<ol>
 		        	    		<li>策略开头
 			        	    		<pre>
@@ -105,8 +99,8 @@ class Help extends Component {
 			        	    			</code>
 			        	    		</pre>
 			        	    		<blockquote>
-			        	    			<p>#coding: UTF-8 方便在代码中加入中文汉字。</p>
-                                        <p>#注释说明代码方法及名称</p>
+			        	    			<span>#coding: UTF-8 方便在代码中加入中文汉字。</span>
+                                        <span>#注释说明代码方法及名称</span>
 			        	    		</blockquote>
 		        	    		</li>
 		        	    		<li>导入策略代码中需要的库函数
@@ -127,16 +121,16 @@ class Help extends Component {
 			        	    			</code>
 			        	    		</pre>
 			        	    		<blockquote>
-			        	    			<p>(导入的基础库主要包括numpy,pandas等,技术指标库包括talib等,若需要用到预测模型文件则需要导入tarfile，joblib等用于解压缩文件，另外基于预测模型可能需要加载数据预处理库，例如：sklearn的preprocessing 等)。</p>
-                                        <p>注意: 此处库函数，应尽量使用os,sys等库防止系统出错。</p>
+			        	    			<span>(导入的基础库主要包括numpy,pandas等,技术指标库包括talib等,若需要用到预测模型文件则需要导入tarfile，joblib等用于解压缩文件，另外基于预测模型可能需要加载数据预处理库，例如：sklearn的preprocessing 等)。</span>
+                                        <span>注意: 此处库函数，应尽量使用os,sys等库防止系统出错。</span>
 			        	    		</blockquote>
 		        	    		</li>
 		        	    		<li>具体策略代码编写说明
-		        	    			<p>3.1策略中会使用的回调函数。</p>
+		        	    			<span>3.1策略中会使用的回调函数。</span>
 		        	    			<blockquote>
-                                        <p>这些函数可以只实现部分，不需要的使用的pass略过。</p>
+                                        <span>这些函数可以只实现部分，不需要的使用的pass略过。</span>
 			        	    		</blockquote>
-			        	    		<p><code>on_init</code>,  定义变量,并初始化,需要在函数外部使用的变量都要用context.var.XXX来定义。</p>
+			        	    		<span><code>on_init</code>,  定义变量,并初始化,需要在函数外部使用的变量都要用context.var.XXX来定义。</span>
 			        	    		<pre>
 			        	    			<code>
 			        	    				<div>context.var.barList <span className='equal'>=</span> []</div>
@@ -157,26 +151,26 @@ class Help extends Component {
 			        	    				<div>context.var.testPos <span className='equal'>=</span> <span className='zero'>0</span>                 <span className='zhushi'>#记录持仓</span></div>
 			        	    			</code>
 			        	    		</pre>
-			        	    		<p><code>on_start</code>, 策略启动时调用，一般除写日志，外不做别的操作。</p>
+			        	    		<span><code>on_start</code>, 策略启动时调用，一般除写日志，外不做别的操作。</span>
 			        	    		<pre>
 			        	    			<code>
 			        	    				<div>context.function.log(<span className='log'>u'nAdaboost_KDJ策略启动</span>)</div>
 			        	    			</code>
 			        	    		</pre>
-			        	    		<p><code>on_stop</code>, 策略停止时调用，一般除写日志，外不做别的操作。</p>
+			        	    		<span><code>on_stop</code>, 策略停止时调用，一般除写日志，外不做别的操作。</span>
 			        	    		<pre>
 			        	    			<code>
 			        	    				<div>context.function.log(<span className='log'>u'nAdaboost_KDJ策略停止</span>)</div>
 			        	    			</code>
 			        	    		</pre>
-			        	    		<p><code>on_tick</code>,  使用TICK数据（高频数据）时在此函数中使用，tick是由平台维护。</p>
-			        	    		<p>若需使用，首先获取 tick   <code>tick = context.var.tick</code> ,再调用  <span><code>context.function.buy(tick.price) </code> <code> context.function.sell(tick.price)</code></span> 获取tick时刻的价格。</p>
-			        	    		<p><code>on_bar</code>,  使用分钟数据，该函数使用中，bar由平台维护。</p>
+			        	    		<span><code>on_tick</code>,  使用TICK数据（高频数据）时在此函数中使用，tick是由平台维护。</span>
+			        	    		<span>若需使用，首先获取 tick   <code>tick = context.var.tick</code> ,再调用  <span><code>context.function.buy(tick.price) </code> <code> context.function.sell(tick.price)</code></span> 获取tick时刻的价格。</span>
+			        	    		<span><code>on_bar</code>,  使用分钟数据，该函数使用中，bar由平台维护。</span>
 			        	    		<blockquote>
-			        	    			<p>本平台推荐使用bar数据预测，平台上绝大部分逻辑代码都在此函数中实现。</p>
+			        	    			<span>本平台推荐使用bar数据预测，平台上绝大部分逻辑代码都在此函数中实现。</span>
 			        	    		</blockquote>
-			        	    		<p>首先获取bar <code>bar = context.var.bar</code> 。</p>
-			        	    		<p>存分钟数据的CHLOV（bar.close,bar.high,bar.low,bar.open,bar.volume）</p>
+			        	    		<span>首先获取bar <code>bar = context.var.bar</code> 。</span>
+			        	    		<span>存分钟数据的CHLOV（bar.close,bar.high,bar.low,bar.open,bar.volume）</span>
 			        	    		<pre>
 			        	    			<code>
 			        	    				<div>context.var.barList.append(bar.close)      <span className='zhushi'>#存分钟价格</span></div>
@@ -186,7 +180,7 @@ class Help extends Component {
 			        	    				<div>context.var.volume.append(bar.volume) </div>
 			        	    			</code>
 			        	    		</pre>
-			        	    		<p>若需要调用，使用金融技术分析指标（调用talib）则需要存数据列表，并转换为numpy.array格式。</p>
+			        	    		<span>若需要调用，使用金融技术分析指标（调用talib）则需要存数据列表，并转换为numpy.array格式。</span>
 			        	    		<pre>
 			        	    			<code>
 			        	    				<div>arrClose  <span className='equal'>=</span> np.array(context.var.barList,dtype <span className='equal'>=</span> np.float)</div>
@@ -196,7 +190,7 @@ class Help extends Component {
 			        	    				<div>arrVolume  <span className='equal'>=</span> np.array(context.var.volume,dtype <span className='equal'>=</span> np.float)</div>
 			        	    			</code>
 			        	    		</pre>
-			        	    		<p>例如使用talib计算KDJ。</p>
+			        	    		<span>例如使用talib计算KDJ。</span>
 			        	    		<pre>
 			        	    			<code>
 			        	    				<div>context.var.raw_data <span className='equal'>=</span> DataFrame()</div>
@@ -204,28 +198,28 @@ class Help extends Component {
 			        	    				<div>context.var.real_data[<span className='log'>'KDJ_D'</span>] <span className='equal'>=</span> talib.STOCH(arrHigh,arrLow,arrClose)[<span className='zero'>1</span>] </div>
 			        	    			</code>
 			        	    		</pre>
-			        	    		<p>使用talib计算并将计算数据存到Pandas dataFrame中。</p>
-			        	    		<p>若需要用预测模型，还需要加载模型文件。</p>
+			        	    		<span>使用talib计算并将计算数据存到Pandas dataFrame中。</span>
+			        	    		<span>若需要用预测模型，还需要加载模型文件。</span>
 			        	    		<pre>
 			        	    			<code>
 			        	    				<div>clf <span className='equal'>=</span> joblib.load('Adaboost_IF_M3_KDJ.pkl')</div>
 			        	    			</code>
 			        	    		</pre>
-			        	    		<p>调用模型预测之前还需要将数据规整化处理。</p>
+			        	    		<span>调用模型预测之前还需要将数据规整化处理。</span>
 			        	    		<pre>
 			        	    			<code>
 			        	    				<div>context.var.min_max_scaler <span className='equal'>=</span> preprocessing.MinMAXScaler</div>
 			        	    				<div>context.var.x_test1 <span className='equal'>=</span> context.var.min_max_scaler.fit_transform(context.var.raw_data[<span className='zero'>40:</span>])</div>
 			        	    			</code>
 			        	    		</pre>
-			        	    		<p>开始进行预测。</p>
+			        	    		<span>开始进行预测。</span>
 			        	    		<pre>
 			        	    			<code>
 			        	    				<div>context.var.answer <span className='equal'>=</span> clf.predict(context.var.x_test1)   <span className='zhushi'>#进行预测</span></div>
 			        	    			
 			        	    			</code>
 			        	    		</pre>
-			        	    		<p>根据预测，止盈止损条件等等逻辑判断，进行相应买卖操作。一般伴随买卖操作也会写相应的log日志。</p>
+			        	    		<span>根据预测，止盈止损条件等等逻辑判断，进行相应买卖操作。一般伴随买卖操作也会写相应的log日志。</span>
 			        	    		<pre>
 			        	    			<code>
 			        	    				<div>context.function.cover(context.var.barList[-1])</div>
@@ -233,28 +227,28 @@ class Help extends Component {
 			        	    			
 			        	    			</code>
 			        	    		</pre>
-			        	    		<p><code>on_order</code>, 用于实盘模拟及真实交易的订单预定，由平台维护。</p>
-			        	    		<p><code>on_newday</code>， 每天的24点后平台会调用此函数,系统平台内部使用。</p>
+			        	    		<span><code>on_order</code>, 用于实盘模拟及真实交易的订单预定，由平台维护。</span>
+			        	    		<span><code>on_newday</code>， 每天的24点后平台会调用此函数,系统平台内部使用。</span>
 			        	    		<blockquote>
-			        	    			<p><code>on_order</code> <code>on_newday</code> 一般不在其中定义实现，只简单的pass。</p>
+			        	    			<span><code>on_order</code> <code>on_newday</code> 一般不在其中定义实现，只简单的pass。</span>
 			        	    		</blockquote>
-			        	    		<p>3.2 函数的输入项均为context。</p>
-			        	    		<p>context是一个封装类，包含定义变量使用的对象context.var，调用函数使用的对象context.function。</p>
+			        	    		<span>3.2 函数的输入项均为context。</span>
+			        	    		<span>context是一个封装类，包含定义变量使用的对象context.var，调用函数使用的对象context.function。</span>
 			        	    		<blockquote>
-                                        <p>其中context.function对象可调用的方法函数有：</p>
-                                        <p>context.function.buy(float price)（以price价格买多）</p>
-                                        <p>context.function.sell(float price)（以price价格卖多）</p>
-                                        <p>context.function.short(float price)（以price价格卖空）</p>
-                                        <p>context.function.cover(float price)（以price价格买空）</p>
-                                        <p>context.function.log(String loginfo) （向策略日志中写入内容）</p>
+                                        <span>其中context.function对象可调用的方法函数有：</span>
+                                        <span>context.function.buy(float price)（以price价格买多）</span>
+                                        <span>context.function.sell(float price)（以price价格卖多）</span>
+                                        <span>context.function.short(float price)（以price价格卖空）</span>
+                                        <span>context.function.cover(float price)（以price价格买空）</span>
+                                        <span>context.function.log(String loginfo) （向策略日志中写入内容）</span>
 
 			        	    		</blockquote>
 
 		        	    		</li>
 		        	    	</ol>
-		        	    </p>
+		        	    </span>
 		        	    <h4 id='addTradeStrategy' className='helpSubtitle'>如何添加“交易策略”？</h4>
-		        	    <p>
+		        	    <span>
 		        	    	<ol>
 		        	            <li>点击“交易策略”后的“+”按钮。
 			        	            <div>
@@ -272,9 +266,9 @@ class Help extends Component {
 			        				</div>
 			        			</li>			        				
 			        	    </ol>
-		        	    </p>
+		        	    </span>
 		        	    <h4 id='histroy' className='helpSubtitle'>如何由交易策略代码创建历史回测？</h4>
-		        	    <p>
+		        	    <span>
 		        	    	<ol>
 		        	    	    <li>
 				        			以“RSV”为例，点击策略后的“+”按钮。
@@ -284,22 +278,22 @@ class Help extends Component {
 				        		</li>
 				        		<li>
 				        		    弹出创建实例对话框。
-				        				<p>实例类型选择“历史回测”;</p>
-				        				<p>填写实例的“交易名”，选择“交易所代码”（目前包含CTP,CSRPME,OKCOIN）其中一项;</p>
-				        				<p>填写“交易合约”名称（正式合法，产品可订阅）;</p>
-				        				<p>选择回测时间“开始时间”和“结束时间”;</p>
-				        				<p>点击“添加模型”（若交易策略不依赖预测模型可无需添加，直接点击“添加”按钮即可）。</p>
+				        				<span>实例类型选择“历史回测”;</span>
+				        				<span>填写实例的“交易名”，选择“交易所代码”（目前包含CTP,CSRPME,OKCOIN）其中一项;</span>
+				        				<span>填写“交易合约”名称（正式合法，产品可订阅）;</span>
+				        				<span>选择回测时间“开始时间”和“结束时间”;</span>
+				        				<span>点击“添加模型”（若交易策略不依赖预测模型可无需添加，直接点击“添加”按钮即可）。</span>
 				        				<div>
 				        					<img src={require("../../src/images/histroyList.png")} className="img_br img-responsive"/>
 				        				</div>
 				        				
 				        		</li>
 				        		<li>弹出“模型信息输入框”。
-		                            	<p>选择“模型类型”（包含“经典时间序列自回归模型”，“机器学习分类模型”，“机器学习回归模型”，“金融技术指标回归模型”）;</p>
-		                            	<p>填写模型相关内容信息;</p>
-		                            	<p>点击“上传模型文件”按钮，上传使用的模型文件;</p>
+		                            	<span>选择“模型类型”（包含“经典时间序列自回归模型”，“机器学习分类模型”，“机器学习回归模型”，“金融技术指标回归模型”）;</span>
+		                            	<span>填写模型相关内容信息;</span>
+		                            	<span>点击“上传模型文件”按钮，上传使用的模型文件;</span>
 		                            	
-		                            	<p>最后，点击“确定”来完成创建策略实例-“策略产品”。</p>
+		                            	<span>最后，点击“确定”来完成创建策略实例-“策略产品”。</span>
 		                            	<div>
 		                               	   <img src={require("../../src/images/addModel.png")} className="img_br img-responsive"/>
 		                               </div>
@@ -312,8 +306,8 @@ class Help extends Component {
 				        		</li>
 				        		<li>
 				        			选择“交易产品”Tab。
-				        			<p>点击启动按钮来启动实例运行，直到状态显示“运行结束”。</p>
-				        			<p>点击图中的连接可以查看最近一次交易的数据。</p>
+				        			<span>点击启动按钮来启动实例运行，直到状态显示“运行结束”。</span>
+				        			<span>点击图中的连接可以查看最近一次交易的数据。</span>
 				        			<div>
 				        				<img src={require("../../src/images/rsv_his.png")} className="img_br img-responsive"/>
 				        			</div>
@@ -326,12 +320,12 @@ class Help extends Component {
 				        		</li>
 				        		 						    
 				        	</ol>
-		        	    </p>
+		        	    </span>
 		        	    <hr className='dirves'/>
 		        	    <h2 id='product' className='helpTitle'>交易产品</h2>
-		        	    <p>您可以看到自己提交过的所有策略的实时交易情况，包括在模拟交易环境中的持仓、年化收益率、平均收益率、交易胜率等各项风险分析指标，了解策略的真实表现。</p>
+		        	    <span>您可以看到自己提交过的所有策略的实时交易情况，包括在模拟交易环境中的持仓、年化收益率、平均收益率、交易胜率等各项风险分析指标，了解策略的真实表现。</span>
 		        	    <h4 id='createProduct' className='helpSubtitle'>如何创建“交易产品”？</h4>
-		        	    <p>
+		        	    <span>
 		        	    	<ol>
 			        	    	<li>点击添加成功后的“RSV交易策略”后面的添加实例按钮。
 				        			    <div>
@@ -339,23 +333,23 @@ class Help extends Component {
 			        				    </div>
 				        			</li>
 				        			<li>弹出添加实例的对话框。
-				        			   <p>选择“实例类型”（包含“实盘模拟”，“历史回测”，“真实交易”）;</p>
-				        			   <p>填写实例的“交易名”;</p>
-				        			   <p>选择“交易所代码”（目前包含CTP,CSRPME,OKCOIN）其中一项</p>
-				        			   <p>填写“交易合约”名称（正式合法，产品可订阅）;</p>
-				        			   <p>填写“交易手数”（即一次交易买卖的数目）;</p>
-				        			   <p>点击“添加模型”（若交易策略不依赖预测模型可无需添加，直接点击“添加”按钮即可）；</p>                              
+				        			   <span>选择“实例类型”（包含“实盘模拟”，“历史回测”，“真实交易”）;</span>
+				        			   <span>填写实例的“交易名”;</span>
+				        			   <span>选择“交易所代码”（目前包含CTP,CSRPME,OKCOIN）其中一项</span>
+				        			   <span>填写“交易合约”名称（正式合法，产品可订阅）;</span>
+				        			   <span>填写“交易手数”（即一次交易买卖的数目）;</span>
+				        			   <span>点击“添加模型”（若交易策略不依赖预测模型可无需添加，直接点击“添加”按钮即可）；</span>                              
 		                               <div>
 		                               	  <img src={require("../../src/images/createExample.png")} className="img_br img-responsive"/>
 		                               </div>
 		                                                                                          
 		                            </li>
 		                            <li>弹出“模型信息输入框”。
-		                            	<p>选择“模型类型”（包含“经典时间序列自回归模型”，“机器学习分类模型”，“机器学习回归模型”，“金融技术指标回归模型”）;</p>
-		                            	<p>填写模型相关内容信息;</p>
-		                            	<p>点击“上传模型文件”按钮上传模型文件;</p>
+		                            	<span>选择“模型类型”（包含“经典时间序列自回归模型”，“机器学习分类模型”，“机器学习回归模型”，“金融技术指标回归模型”）;</span>
+		                            	<span>填写模型相关内容信息;</span>
+		                            	<span>点击“上传模型文件”按钮上传模型文件;</span>
 		                            	
-		                            	<p>最后，点击“确定”来完成创建策略实例-“策略产品”。</p>
+		                            	<span>最后，点击“确定”来完成创建策略实例-“策略产品”。</span>
 		                            	<div>
 		                               	   <img src={require("../../src/images/addModel.png")} className="img_br img-responsive"/>
 		                               </div>
@@ -366,8 +360,8 @@ class Help extends Component {
 		                               </div>
 		                            </li>
 		                            <li>选择“交易产品”Tab。
-		                               <p>点击 <img src={require("../../src/images/ctp.png")}/> 中左侧的按钮，并展开“CTP”下的所有运行实例，找到创建的实例RSV，显示实例的信息。</p>
-		                               <p>点击图中的连接可以查看最近一次交易的数据。</p>
+		                               <span>点击 <img src={require("../../src/images/ctp.png")}/> 中左侧的按钮，并展开“CTP”下的所有运行实例，找到创建的实例RSV，显示实例的信息。</span>
+		                               <span>点击图中的连接可以查看最近一次交易的数据。</span>
 		                               <div>
 		                               	 <img src={require("../../src/images/rsvDetail.png")} className="img_br img-responsive"/>
 		                               </div>    
@@ -382,9 +376,9 @@ class Help extends Component {
 		                            
 				        			
 				        	</ol>
-		        	    </p>
+		        	    </span>
 		        	    <h4 id='read' className='helpSubtitle'>如何查看“交易产品”的交易情形？</h4>
-		        	    <p>
+		        	    <span>
 		        	    	<ol>
 				        			<li>
 				        				例如“BBI_RSV”策略。
@@ -443,12 +437,12 @@ class Help extends Component {
 				        			</li>
 				        			*/}
 				        	</ol>
-		        	    </p>
+		        	    </span>
 		        	    <hr className='dirves'/>
 		        	    <h2 id='predictCode' className='helpTitle'>预测代码</h2>
-		        	    <p></p>
+		        	    <span></span>
 		        	    <h4 id='addPredictCode' className='helpSubtitle'>如何添加“预测代码”？</h4>
-		        	    <p>
+		        	    <span>
 		        	    	<ol>
 			        	    	<li>点击“预测代码”后的“+”按钮。
 			        	    	    <div>
@@ -456,9 +450,9 @@ class Help extends Component {
 			        	    	    </div>
 			        	    	</li>
 			        				<li>弹出“预测代码”的对话框。
-				        				<p>输入策略名（你自己定义的任意策略名字, 以下以 predict_lSTM_test 为例）；</p>
-				        				<p>输入策略的预测输出，包括预测变量、变量类型（int,string,float等）、预测内容，通过点击“+”和“-”按钮来自定义预测的输出个数，且无上限；</p>
-				        				<p>最后点击“选择文件”，上传编写好的“策略代码文件”，并点击添加。</p>	        				
+				        				<span>输入策略名（你自己定义的任意策略名字, 以下以 predict_lSTM_test 为例）；</span>
+				        				<span>输入策略的预测输出，包括预测变量、变量类型（int,string,float等）、预测内容，通过点击“+”和“-”按钮来自定义预测的输出个数，且无上限；</span>
+				        				<span>最后点击“选择文件”，上传编写好的“策略代码文件”，并点击添加。</span>	        				
 				        				<div>
 				        					<img src={require("../../src/images/predictDialog.png")} className="img_br img-responsive"/>
 				        				</div>
@@ -469,12 +463,12 @@ class Help extends Component {
 				        				</div>
 			        			</li>
 			        		</ol>
-		        	    </p>
+		        	    </span>
 		        	    <hr className='dirves'/>
 		        	    <h2 id='PredictService' className='helpTitle'>预测服务</h2>
-		        	    <p></p>
+		        	    <span></span>
 		        	    <h4 id='createPredict' className='helpSubtitle'>如何创建“预测服务”？</h4>
-		        	    <p>
+		        	    <span>
 		        	    	<ol>
 				        		<li>点击添加成功后的预测代码后面的"+"按钮。
 				        			<div>
@@ -482,22 +476,22 @@ class Help extends Component {
 			        				</div>
 				        		</li>
 				        		<li>弹出添加实例的对话框。
-				        			<p>选择“实例类型”（包含“实盘模拟”，“历史回测”）;</p>
-				        			<p>填写实例的“交易名” （以下以 predict_LSTM_test 为例）；</p>
-				        			<p>选择“交易所代码”（目前包含CTP,CSRPME,OKCOIN）其中一项;</p>
-				        			<p>填写“交易合约”名称（正式合法，产品可订阅）;</p>
-				        			<p>填写“交易手数”（即一次交易买卖的数目）;</p>
-				        			<p>点击“添加模型”（若交易策略不依赖预测模型可无需添加，直接点击“添加”按钮即可）；</p>                              
+				        			<span>选择“实例类型”（包含“实盘模拟”，“历史回测”）;</span>
+				        			<span>填写实例的“交易名” （以下以 predict_LSTM_test 为例）；</span>
+				        			<span>选择“交易所代码”（目前包含CTP,CSRPME,OKCOIN）其中一项;</span>
+				        			<span>填写“交易合约”名称（正式合法，产品可订阅）;</span>
+				        			<span>填写“交易手数”（即一次交易买卖的数目）;</span>
+				        			<span>点击“添加模型”（若交易策略不依赖预测模型可无需添加，直接点击“添加”按钮即可）；</span>                              
 		                            <div>
 		                               <img src={require("../../src/images/histroyList.png")} className="img_br img-responsive"/>
 		                            </div>		                                                                                          
 		                        </li>
 		                        <li>弹出“模型信息输入框”。
-		                            <p>选择“模型类型”（包含“经典时间序列自回归模型”，“机器学习分类模型”，“机器学习回归模型”，“金融技术指标回归模型”）;</p>
-		                            <p>填写模型相关内容信息;</p>
-		                            <p>点击“上传模型文件”按钮，上传预测使用的模型文件;</p>
+		                            <span>选择“模型类型”（包含“经典时间序列自回归模型”，“机器学习分类模型”，“机器学习回归模型”，“金融技术指标回归模型”）;</span>
+		                            <span>填写模型相关内容信息;</span>
+		                            <span>点击“上传模型文件”按钮，上传预测使用的模型文件;</span>
 		                           
-		                            <p>最后，点击“确定”来完成创建预测服务。</p>
+		                            <span>最后，点击“确定”来完成创建预测服务。</span>
 		                            <div>
 		                               	<img src={require("../../src/images/addModel1.png")} className="img_br img-responsive"/>
 		                            </div>
@@ -508,12 +502,12 @@ class Help extends Component {
 		                            </div>
 		                        </li>
 		                        <li>选择“预测服务”Tab。
-		                            <p>点击 CTP左侧的"+"按钮，并展开“CTP”下的所有运行实例。
+		                            <span>点击 CTP左侧的"+"按钮，并展开“CTP”下的所有运行实例。
 			                            <div>
 			                            	<img src={require("../../src/images/predictCtp.png")} className='img_br img-responsive'/>
 			                            </div>
-		                            </p>
-		                            <p>找到创建的实例 predict_LSTM_test ，显示实例的信息。</p>
+		                            </span>
+		                            <span>找到创建的实例 predict_LSTM_test ，显示实例的信息。</span>
 		                            <div>
 		                               	<img src={require("../../src/images/shipan.png")} className="img_br img-responsive"/>
 		                            </div>   		                               
@@ -526,11 +520,11 @@ class Help extends Component {
 		                        </li>
 		                       			        			
 				        	</ol>
-		        	    </p> 
+		        	    </span> 
 		        	    <h2 id='other' className='helpTitle'>其他辅助功能</h2>	   
-		        	    <p>紫金量化平台还为您准备了丰富的辅助功能，帮助您更有效的进行代码的编写与数据的研究。</p>
+		        	    <span>紫金量化平台还为您准备了丰富的辅助功能，帮助您更有效的进行代码的编写与数据的研究。</span>
 		        	    <h4 id='onLine' className='helpSubtitle'>在线编写“交易代码”和“预测代码”</h4>
-		        	    <p>
+		        	    <span>
 		        	    	<ol>
 		        	    		<li>
 			        	    		点击左上角“新建代码”,会有“交易代码”和“预测代码”两个选项。可根据自己的需求选择功能。
@@ -539,24 +533,24 @@ class Help extends Component {
 				        	    	</div>
 		        	    	    </li>
 		        	    	    <li>
-			        	    	    <p>首先您可以自定义策略代码的名字，编写好代码，确认无误之后，点击“保存为交易策略”或“保存为预测代码”按钮。成功操作之后，可以在页面中“策略代码”或“预测代码”tab中查看。</p>
-			        	    	    <p>可以根据自己的需求，点击下载代码按钮。</p>
+			        	    	    <span>首先您可以自定义策略代码的名字，编写好代码，确认无误之后，点击“保存为交易策略”或“保存为预测代码”按钮。成功操作之后，可以在页面中“策略代码”或“预测代码”tab中查看。</span>
+			        	    	    <span>可以根据自己的需求，点击下载代码按钮。</span>
 
 		        	    	    	<div>
 		        	    	    		<img src={require('../../src/images/createCode.png')} className='img_br img-responsive'/>
 		        	    	    	</div>
 		        	    	    </li>
 		        	    	</ol>
-		        	    </p>
+		        	    </span>
 		        	    <h4 className='helpSubtitle' id='codeTitel'>代码补全与提示</h4>
-		        	    <p>
+		        	    <span>
 		        	    	您可以选择Theme来进行代码主题的选择，当输入部分变量或函数，按 Tab 键后，会进行代码自动补全，若有多个选项时，显示补全列表。
 		        	    	<div>
 		        	    		<img src={require('../../src/images/prompt.png')} className='img_br img-responsive'/>
 		        	    	</div>
-		        	    </p>
+		        	    </span>
 		        	    <h4 className='helpSubtitle' id='export'>导出交易报告</h4>
-		        	    <p>
+		        	    <span>
 		        	       点击屏幕右上角“导出报告”按钮，可将查看的某一天策略交易详情，生成PDF格式的报告，便于分析研究。
 		        	       <div>
 		        	       	   <img src={require('../../src/images/export.png')} className='img_br img-responsive'/>
@@ -564,7 +558,7 @@ class Help extends Component {
 		        	       <a className="backTop" onClick={this.top}><i className="fa fa-arrow-up"></i></a>	
 		        	       <br/><br/><br/>
 		        	    	
-		        	    </p>
+		        	    </span>
 
 			        				        		
 			        		

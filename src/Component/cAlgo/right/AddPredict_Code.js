@@ -52,17 +52,17 @@ class AddPredict_Code extends Component {
 	}
 
 	add(e) {
-	
+
 		e.preventDefault();
-	     // jQuery('#addPredict_code').modal({show: 'false'})
+		// jQuery('#addPredict_code').modal({show: 'false'})
 
 		let note_code = '# coding=utf-8\n';
 		note_code += '""" \n';
-		note_code += '@author: '+ localStorage.getItem("username") + '\n';
+		note_code += '@author: ' + localStorage.getItem("username") + '\n';
 		note_code += '@predict format:\n[\n'
 
-      // {'name': 'high', 'type': 'float', information: 'high value'},
-		$('.predict_format_code').each(function(i){
+		// {'name': 'high', 'type': 'float', information: 'high value'},
+		$('.predict_format_code').each(function(i) {
 			let name = $(this).find('.format_name').val();
 			let type = $(this).find('.format_type').val();
 			let information = $(this).find('.format_information').val();
@@ -77,8 +77,8 @@ class AddPredict_Code extends Component {
 
 		note_code += ']\n"""\n';
 
-		let staticData = getStatic();
-		staticData.predict_demo = note_code + staticData.predict_demo_code;
+		// let staticData = getStatic();
+		// staticData.predict_demo = note_code + staticData.predict_demo_code;
 
 		this.props.dispatch(showMyCode('predict'));
 		this.props.dispatch(ShowList('myCode'));
@@ -89,12 +89,15 @@ class AddPredict_Code extends Component {
 
 
 
-
 	}
 	addFormat(e) {
 		this.setState({
 			numChildren: this.state.numChildren + 1
 		});
+	}
+	close() {
+		$('#addPredict_code').css('display', 'none');
+		$('#addPredict_code').removeClass('in');
 	}
 	render() {
 		const modalStyle = {
@@ -132,7 +135,9 @@ class AddPredict_Code extends Component {
 
 							</div>
 							<div className="modal-footer" style={{borderTop:'0px solid #525252',paddingTop:'0px'}}>
-								<button type="button" className="btn btn-default" data-dismiss="modal">关闭
+								<button type="button" className="btn btn-default" data-dismiss="modal"
+								onClick={(e)=>this.close()}
+								>关闭
 								</button>
 								<button  type="button" type="submit" className="btn btn-primary" ref='btnStr' 
 								// data-dismiss="modal" 

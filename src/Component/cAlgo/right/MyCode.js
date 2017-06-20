@@ -5,18 +5,20 @@ import React, {
 import {
 	ShowList,
 	updateClass,
-	alertMessage
+	alertMessage,
+	runBackTest
 } from '../../../Redux/Action/Action'
 import {
 	connect
 } from 'react-redux'
 import $ from 'jquery'
+import jQuery from 'jquery'
 import {
 	getClass,
 	downFile,
 	addClass,
 	getStatic,
-	getKeywords
+	getKeywords,
 } from '../../../Redux/Action/shareAction'
 import brace from 'brace';
 import AceEditor from 'react-ace';
@@ -32,8 +34,11 @@ import 'brace/theme/tomorrow_night_eighties';
 
 import 'brace/ext/language_tools';
 import 'brace/ext/searchbox';
-import RunBack from './RunBack'
+
 let ace = require('brace');
+import {
+	introJs
+} from 'intro.js';
 
 // require('brace/ext/themelist');
 // let themes = ace.acequire("ace/ext/themelist");
@@ -71,7 +76,7 @@ class MyCode extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			codeType: '',
+			codeType: 'trade',
 			code: '',
 			name: '',
 			theme: 'tomorrow_night_eighties',
@@ -80,9 +85,13 @@ class MyCode extends Component {
 	componentWillReceiveProps(nextProps) {
 		let code;
 		if (nextProps.codeType == 'predict') {
-			code = getStatic().predict_demo;
+			$('#class_type').val('predict');
+			code = getStatic().predict_demo_code;
+			this.showPredictDemo();
 		} else {
+			$('#class_type').val('trade');
 			code = getStatic().trade_demo;
+			this.showTradeDemo();
 		}
 		this.setState({
 			name: '',
@@ -90,8 +99,59 @@ class MyCode extends Component {
 			codeType: nextProps.codeType
 		})
 	}
+	showPredictDemo() {
+		// var intro = introJs();
+		// intro.setOptions({
+		// 	steps: [{
+		// 		element: document.querySelectorAll('#addPredict_code')[0],
+		// 		intro: "填写预测目标、变量",
+		// 		position: 'left'
+		// 	}]
+		// });
+		// intro.onexit(function() {
+		// 	// $('#myModal2').removeClass('in');
+		// 	$('#myModal2').css('display', 'none');
+		// 	$('.modal-backdrop').eq(0).remove();
+		// }).start()
+	}
+	showTradeDemo() {
+		var intro = introJs();
+		intro.setOptions({
+			steps: [{
+				element: document.querySelector('#mycode_editor'),
+				intro: "使用Python语言编写策略",
+				position: 'left'
+			}, {
+				element: document.querySelector('#run_back_btn'),
+				intro: "使用策略代码运行回测",
+				position: 'left'
+			}, {
+				element: document.querySelectorAll('#myModal2')[0],
+				// element: document.querySelector('#add_strategy_dialog'),
+				intro: "填写实例信息",
+				position: 'left'
+			}, {
+				element: document.querySelector('#right_bottom_detail'),
+				intro: "查看回测结果",
+				position: 'left'
+			}]
+		});
+		intro.onexit(function() {
+			$('#myModal2').removeClass('in');
+			$('#myModal2').css('display', 'none');
+			$('.modal-backdrop').eq(0).remove();
+		}).start()
+	}
 	componentDidUpdate() {
+		// let aceHeight;
+		// if (this.state.codeType == 'trade') {
+		// 	aceHeight = (document.documentElement.clientHeight - 95 + 35) - 340;
 
+		// } else {
+		// 	aceHeight = (document.documentElement.clientHeight - 85 + 35);
+		// }
+		// $('.ace_content').css('height', aceHeight)
+		// console.log($('.ace_content'))
 	}
 	downCode() {
 		let text = this.state.code;
@@ -138,7 +198,7 @@ class MyCode extends Component {
 		let result = addClass(formdata);
 		if (result == true) {
 			this.props.dispatch(updateClass());
-			this.props.dispatch(alertMessage('添加成功', 1000));
+			this.props.dispatch(alertMessage('添加成功', 2000));
 		} else {
 			this.props.dispatch(alertMessage(result, 60000));
 		}
@@ -161,13 +221,25 @@ class MyCode extends Component {
 		formdata.append('name', this.state.name);
 		formdata.append('code', new Blob([this.state.code]));
 		formdata.append('predict_format', formatJson);
-		let result = addClass(formdata);
-		if (result == true) {
+		addClass(formdata).then((data) => {
 			this.props.dispatch(updateClass());
 			this.props.dispatch(alertMessage('添加成功', 1000));
-		} else {
+		}, (result) => {
 			this.props.dispatch(alertMessage(result, 60000));
-		}
+		})
+	}
+	run_stra() {
+		$(' #add_script_name ').html('在线运行回测');
+		$(' #class_type ').text('回测名');
+		$(' #choose_strategy_div ').css('display', 'none');
+		$('#choose_strategy_type').attr("disabled", true);
+
+		getStatic().run_code = this.state.code;
+		this.props.dispatch(runBackTest(true));
+		// setTimeout(() => {
+		// introJs().goToStepNumber(1).start();
+		// }, 1000)
+
 	}
 	render() {
 		const topStyle = {
@@ -195,15 +267,16 @@ class MyCode extends Component {
 			height: '25px',
 			backgroundColor: '#292929'
 		}
-		let CodeHeight = (document.documentElement.clientHeight - 45 + 35) + 'px';
-		let aceHeight;
+		let CodeHeight, aceHeight;
 		if (this.state.codeType == 'trade') {
-			aceHeight = (document.documentElement.clientHeight - 64 - 25) / 2 + 74.5 + 35 + 'px';
+			CodeHeight = (document.documentElement.clientHeight - 64 - 25) / 2 + 160;
+			aceHeight = (document.documentElement.clientHeight - 95 + 35) - 340;
 
 		} else {
-			aceHeight = (document.documentElement.clientHeight - 95 + 35) + 'px';
-
+			CodeHeight = (document.documentElement.clientHeight - 45 + 35);
+			aceHeight = (document.documentElement.clientHeight - 85 + 35);
 		}
+
 		const style = {
 			fontSize: '14px !important',
 			border: '1px solid lightgray'
@@ -211,7 +284,7 @@ class MyCode extends Component {
 		return (
 			<div style={topStyle}>
 		
-	  		<div style={{height:CodeHeight,overflow: 'hidden',padding:'10px',color:'#fff'}}>
+	  		<div style={{height:CodeHeight,overflow: 'hidden',padding:'5px',color:'#fff'}}>
 
                     <div style={{width:'100%'}}>
 
@@ -245,14 +318,14 @@ class MyCode extends Component {
                     className='btn btn-default smallfont' 
                     onClick={this.exit.bind(this)} style={btnBg} >退出
                     </button>
-                    <button 
+                    {document.body.clientWidth>900?<button 
                     onMouseOut={(e)=>{e.target.style.backgroundColor = '#292929'}}
                     onMouseOver={(e)=>{e.target.style.backgroundColor = '#6b6b6b'}} 
                     className='btn btn-default smallfont' 
                     onClick={this.downCode.bind(this)} style={btnBg} 
                     disabled={this.state.name == '' || this.state.code == ''}
                     title={this.state.name == '' || this.state.code == ''?'输入策略名或代码内容':''}>导出代码
-                    </button>
+                    </button>:null}
                     <div className="dropdown" style={{float:'right'}}>
                          {this.state.codeType == 'trade'?
                       
@@ -279,32 +352,48 @@ class MyCode extends Component {
                               </button>
                           }
                    </div>
+                  
+                  
 
-
-
+                    <button 
+                    // data-step="2" data-intro='使用策略代码运行回测' data-position="right"
+                    onMouseOut={(e)=>{e.target.style.backgroundColor = '#292929'}} 
+                    onMouseOver={(e)=>{e.target.style.backgroundColor = '#6b6b6b'}}
+                    className='btn btn-default smallfont' 
+                    onClick={(e)=>this.run_stra()}
+                    data-toggle="modal" data-target="#myModal2"
+                    id = 'run_back_btn'
+                    style={btnBg} >运行回测
+                    </button>
+                   
+                
 
                     </div>
+                    <div style={{height:CodeHeight-42}} 
+                    id='mycode_editor'
+                    // data-step="1" data-intro='使用Python语言编写策略' data-position="left"
+                    >
             
-                		<AceEditor
-                		width='100%'
+                     <AceEditor
+                     width='100%'
                      mode="python"	
                      theme={this.state.theme}
-                     height={aceHeight}
+                     height='100%'
                      value = {this.state.code}
                      onChange={this.handleChange.bind(this)}
                      name={this.state.name}
-                    enableLiveAutocompletion={true}
-                    enableBasicAutocompletion={true}
-                    editorProps={{$blockScrolling: Infinity}}
-                  />
+                     enableLiveAutocompletion={true}
+                     enableBasicAutocompletion={true}
+                     editorProps={{$blockScrolling: Infinity}}
+                    />
+                      </div>
 
-			      {this.state.codeType == 'trade'?  <RunBack />:null}
 			  
                    
 			    </div>
 
-			   {/* <AddPredict_Code name={this.state.name} code={this.state.file}/>*/}
-		</div>
+
+			< /div>
 		)
 	}
 }

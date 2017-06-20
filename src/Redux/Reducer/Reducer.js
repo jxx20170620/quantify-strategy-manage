@@ -290,3 +290,14 @@ export const reduToLoading = (state = '', action) => {
 			return state;
 	}
 }
+export const reduToRunBack = (state = '', action) => {
+	switch (action.type) {
+		case 'RUN_BACK':
+			return {
+				flag: action.flag,
+				time: new Date()
+			}
+		default:
+			return state;
+	}
+}

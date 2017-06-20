@@ -4,9 +4,6 @@ import ChooseTime from './ChooseTime'
 import AddTrade from './AddTrade'
 import AddStrategy from './AddStrategy'
 import AddPredict from './AddPredict'
-import ExchangeTrade from './ExchangeTrade'
-import ExchangePredict from './ExchangePredict'
-import ExchangeHistory from './ExchangeHistory'
 // import Modelshare from './Modelshare'
 import PredictList from './PredictList'
 import $ from 'jquery'
@@ -53,7 +50,7 @@ class LeftTable extends Component {
 			// $('#' + event.target.id).parent().css('backgroundColor', '#525252');
 			$(event.target).parent().css('backgroundColor', '#525252');
 		}
-		event.stopPropagation();
+		// event.stopPropagation();
 	}
 	tableMouseOut(e) {
 		if (e.target.style.backgroundColor == 'rgb(50, 50, 50)') {
@@ -147,9 +144,9 @@ class LeftTable extends Component {
 }
 const mapStateToProps = (state) => {
 	return {
-         update:state.reduUpdateClass,
-         StrategyList: state.reduToStrategyList.StrategyList,
-		 BtstrategyList: state.reduToBtstrategyList.BtstrategyList,
+         // update:state.reduUpdateClass,
+         // StrategyList: state.reduToStrategyList.StrategyList,
+		 // BtstrategyList: state.reduToBtstrategyList.BtstrategyList,
 	};
 }
 export default connect(mapStateToProps)(LeftTable);

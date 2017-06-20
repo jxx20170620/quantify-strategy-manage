@@ -218,3 +218,9 @@
 			flag
 		};
 	}
+	export function runBackTest(flag) {
+		return {
+			type: 'RUN_BACK',
+			flag
+		};
+	}

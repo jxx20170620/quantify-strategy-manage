@@ -40,13 +40,13 @@ class HisProfit extends Component {
   constructor(props) {
     super(props);
     this.state = {
-       _id:'none'
+      _id: 'none'
     };
   }
-  makeChart(id){
-    getNianHua(id).then((data)=>{
+  makeChart(id) {
+    getNianHua(id).then((data) => {
       this.before(data);
-    },(reject)=>{
+    }, (reject) => {
       console.log('error')
     })
   }
@@ -55,11 +55,11 @@ class HisProfit extends Component {
     let dateList = [];
     let winrateList = [];
     for (var i in data) {
-      dateList[i] = (data[i].datetime).slice(5, 10);
-      nianHuaList[i] = Number((data[i].aror  * 100).toFixed(4));
+      dateList[i] = (data[i].date).slice(5, 10);
+      nianHuaList[i] = Number((data[i].aror * 100).toFixed(4));
       winrateList[i] = Number((data[i].row * 100).toFixed(2));
     }
-     // console.log(dateList,nianHuaList)
+    // console.log(dateList,nianHuaList)
 
     let config = {
       chart: {
@@ -117,17 +117,17 @@ class HisProfit extends Component {
         title: {
           text: '年化收益'
         },
-        gridLineWidth: '0px',
         plotLines: [{
           color: '#fff', //线的颜色
           dashStyle: 'solid', //默认值，这里定义为实线
-          value: 0, //定义在那个值上显示标示线，这里是在x轴上刻度为3的值处垂直化一条线
+          value: 0, //
           width: 2 //标示线的宽度，2px
         }],
-        opposite: true,
-        // tickPixelInterval: 10,
-        // gridLineWidth: '0.1px',
-        height: '64%',
+        // opposite: true,
+        tickPixelInterval: 10,
+        gridLineWidth: '0px',
+        height: '65%',
+        // min: -2
       }, {
         labels: {
           align: 'right',
@@ -136,8 +136,8 @@ class HisProfit extends Component {
         title: {
           text: '胜率'
         },
-        top: '65%',
-        height: '35%',
+        top: '70%',
+        height: '30%',
         offset: 0,
         lineWidth: 2
       }],
@@ -179,25 +179,22 @@ class HisProfit extends Component {
         }
       }]
     };
-    unica(Highcharts);
-    // Highcharts.setOptions({
-    //   global: {
-    //     useUTC: false
-    //   }
-    // });
-       let _id =  'HisProfitChart_' + this.props.id;
-        Highcharts.chart(_id,config);
+    // unica(Highcharts);
+    let _id = 'HisProfitChart_' + this.props.id;
+    Highcharts.chart(_id, config);
   }
   componentWillReceiveProps(getProp) {
-    this.setState({_id:getProp.id})
+    this.setState({
+      _id: getProp.id
+    })
   }
-  componentDidMount(){
+  componentDidMount() {
 
   }
   componentDidUpdate(prevProps, prevState) {
-    if(this.props.id==this.props.clickId){
-          $('#HisProfitChart_' + this.props.id).css('width','337px');
-          this.makeChart(this.props.id);
+    if (this.props.id == this.props.clickId) {
+      $('#HisProfitChart_' + this.props.id).css('width', '325px');
+      this.makeChart(this.props.id);
     }
   }
 
@@ -209,15 +206,14 @@ class HisProfit extends Component {
       // boxShadow: '5px 10px 5px #000 '
     }
 
-    let _id =  'HisProfitChart_' + this.state._id;
+    let _id = 'HisProfitChart_' + this.state._id;
     return (
-            <div id={_id} style={hisProfit}></div>
+      <div id={_id} style={hisProfit}></div>
     )
   }
 }
 const mapStateToProps = (state) => {
-  return {
-  };
+  return {};
 }
 const mapDispatchToProps = (dispatch) => {
   return {

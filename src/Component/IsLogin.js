@@ -3,7 +3,7 @@ import AlertApp from './AlertApp'
 import $ from 'jquery'
 import {connect} from 'react-redux'
 import {alertMessage,saveUsertoken} from '../Redux/Action/Action'
-import {Login} from '../Redux/Action/shareAction'
+import {Login,gateways} from '../Redux/Action/shareAction'
 import { browserHistory,hashHistory } from 'react-router'
 class IsLogin extends Component {
 	componentWillMount(){

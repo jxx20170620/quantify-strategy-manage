@@ -16,7 +16,8 @@ import {
   getClass,
   getAllStrategy,
   get_unix_timestamp,
-  dateTodate
+  dateTodate,
+  getStatic
 } from '../Redux/Action/shareAction'
 import Chart from './Chart'
 var params = {
@@ -153,6 +154,7 @@ class PredictChart extends Component {
     };
   }
   beforeRender(id, name, script_id, date) {
+    getStatic().staticData = [];
     $('#predictChart').css("display", "inline");
     // $('#predict_charts').css('display', 'none');
     getClass(script_id).then((script) => {
@@ -201,22 +203,19 @@ class PredictChart extends Component {
     $('#predictChart').css("display", "none");
   }
   downLog() {
-    let predict = this.state.predict;
-    let predict_format = this.state.predict_format;
-    let text;
-    text = 'datetime,'
-    for (let i in predict_format) {
-      text += predict_format[i].name + ',';
-    }
-    for (let i in predict) {
-      text += '\r\n';
-      text += predict[i].datetime.slice(0, 19) + ',';
-      for (let j in predict_format) {
-        text += predict[i][predict_format[j].name] + ',';
-      }
-    }
-    let name = this.state.name + '_' + this.state.predictDate + '_' + Math.round(new Date().getTime());
-    downFile(text, name + '.csv');
+
+    $('#root').css('display', 'none')
+    $('#need_print').css('display', 'block')
+
+    document.title = this.state.name + '_' + this.state.predictDate + '_predict_chart';
+    var printData = document.getElementById("predict_charts").innerHTML;
+    document.getElementById("need_print").innerHTML = printData;
+
+    window.print();
+    document.title = 'TuringAlgo';
+    $('#need_print').css('display', 'none')
+    $('#root').css('display', 'block')
+
   }
   render() { //多执行一次？
     const modalStyle = {
@@ -250,7 +249,7 @@ class PredictChart extends Component {
       border: '1px solid #666'
     }
     let this_exhange, this_symbol;
-    let allStrategy = getAllStrategy(true);
+    let allStrategy = getStatic().all_stra;
     for (let i in allStrategy) {
       if (this.props.predict.id == allStrategy[i].id) {
         this_exhange = allStrategy[i].exchange;
@@ -338,6 +337,7 @@ class PredictChart extends Component {
               }
 
                </div>
+
                        <div id="div_0001"></div>
                        <div id="div_0002"></div>
                        <div id="div_0003"></div>

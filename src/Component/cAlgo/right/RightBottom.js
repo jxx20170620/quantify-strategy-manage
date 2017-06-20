@@ -63,14 +63,28 @@ class RightBottom extends Component{
 								 收益风险分析
 								</a>
 							</li>
+{/*							<li>
+								 <a href="#LogDetail" onClick={(e)=>this.heandleClick(e)}
+								 onMouseOut={(e)=>this.tableMouseOut(e)} 
+	                              onMouseOver={(e)=>this.tableMouseOver(e)}
+	                               ref="eTab" data-toggle="tab" id="tabHeadRight">
+								 日志
+								</a>
+							</li>*/}
 						</ul>
-						<div className="tab-content">
+						<div className="tab-content" 
+						id='right_bottom_detail'
+						// data-step="4" data-intro='回测产生的交易数据' data-position="left"
+						>
 							<div className="tab-pane active needPrint" id="TradeDetail" style={tab}>
 							         <TradeDetail/>
 							</div>
 							<div className="tab-pane needPrint" id="TradeAnalysis" style={tab}>
 							          <TradeAnalysis/>
 							</div>
+{/*						   <div className="tab-pane" id="LogDetail" style={tab}>
+							         log
+							</div>*/}
 						</div>
 		</div>
 		)

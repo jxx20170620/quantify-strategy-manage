@@ -40,7 +40,7 @@ var Register = React.createClass({
 			return;
 		}
 		if(register(userName,userEmail,userPassword)){
-			this.props.dispatch(alertMessage('注册成功！'));
+			this.props.dispatch(alertMessage('注册成功！请至注册邮箱进行激活后登录'));
 			setTimeout(()=>{
 				hashHistory.push('/Login');
 			},1000)

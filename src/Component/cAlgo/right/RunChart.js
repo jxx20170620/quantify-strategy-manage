@@ -2,47 +2,16 @@ import React, {
   Component
 } from 'react'
 import {
-  alertMessage,
-  saveStrategy,
-  saveAlldata2
-} from '../../../Redux/Action/Action'
-import {
   connect
 } from 'react-redux'
 import Highcharts from 'highcharts/highstock'
-import unica from 'highcharts/themes/dark-unica'
-import ReactDOM from 'react-dom';
 import $ from 'jquery'
 import {
-  getStra,
-  idGetStra,
-  statusToChinese,
-  getDateList,
   getTransaction,
   getNextDay,
   makeData,
-  getSortFun,
-  strategyAction,
-  delStrategy,
-  getStrategy,
-  getDatas,
-  tradeMA,
   getStatic,
-  formatDate,
-  getBrowser
 } from '../../../Redux/Action/shareAction'
-const conStyle = {
-  backgroundColor: '#292929',
-  color: '#FFFFFF',
-  border: '0px solid #525252'
-}
-const thstyle = {
-  width: '  15%'
-}
-const tdstyle = {
-  width: '  15.2%'
-}
-
 
 let sdate = '';
 let edate = '';
@@ -62,8 +31,8 @@ class RunChart extends Component {
       Dates: [],
       shortYArr: [],
       buyYArr: [],
-      name:'',
-      date:''
+      name: '',
+      date: ''
     };
   }
 
@@ -72,7 +41,7 @@ class RunChart extends Component {
     let chartData = [];
     let buyYArr = [];
     let shortYArr = [];
-    let data = getStatic().datas.concat();
+    let data = getStatic().datas;
     // let data = [];
     for (let i = 0; i < data.length; i++) {
       chartData.push([
@@ -229,7 +198,7 @@ class RunChart extends Component {
         title: {
           // text: '价格'
         },
-        top:'-10%',
+        top: '0%',
         height: '100%',
         plotLines: [{
           color: '#fff', //线的颜色
@@ -364,9 +333,20 @@ class RunChart extends Component {
 
   }
   componentWillReceiveProps(getProp) {
+    if (getProp.type == 'id') {
+      this.makeChart(alldata2);
+      return;
+    }
+    if (getProp.choosedate == undefined) {
+      if (getProp.type != 'id') {
+        return;
+      }
+      this.makeChart(alldata2);
+      return;
+    }
     this.setState({
-      name:getProp.title.Strategy.name,
-      date:getProp.title.date,
+      name: getProp.title.Strategy.name,
+      date: getProp.title.date,
     })
     clearInterval(this.run_chart);
     if (getProp.choosedate == undefined) {
@@ -425,7 +405,7 @@ const mapStateToProps = (state) => {
     _id: state.reduToChooseId,
     // marketDetail: state.reduShowMarketDetail,
     title: state.reduShowDataTitle,
-    // type:state.reduToShowList
+    type: state.reduToShowList
   };
 }
 const mapDispatchToProps = (dispatch) => {

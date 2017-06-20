@@ -1,4 +1,6 @@
-import React,{Component} from 'react'
+import React, {
+	Component
+} from 'react'
 import {
 	alertMessage,
 	saveToChooseDate,
@@ -11,63 +13,58 @@ import {
 } from 'react-redux'
 import AlertApp from '../../AlertApp'
 import {
-addClass,
+	addClass,
 } from '../../../Redux/Action/shareAction'
 import $ from 'jquery'
-class AddTrade extends Component{
+class AddTrade extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			isPredict:false
+			isPredict: false
 		};
 	}
-	componentWillReceiveProps(){
-	}
+	componentWillReceiveProps() {}
 
-	add(e){
+	add(e) {
 		e.preventDefault();
 		let formdata = new FormData();
-		formdata.append('mode','trade');
+		formdata.append('mode', 'trade');
 		formdata.append('name', $(" #script_name ").val());
 		formdata.append('code', $(" #script_code ")[0].files[0]);
-		let result = addClass(formdata);
-		if(result==true){
+		addClass(formdata).then((data) => {
 			this.props.dispatch(updateClass());
-			this.props.dispatch(alertMessage('添加成功',2000));
-		}else{
-			this.props.dispatch(alertMessage(result,60000));
-		}
-		    // $('#myModal3').removeClass('in');
+			this.props.dispatch(alertMessage('添加成功', 2000));
 			$('#myModal3').hide();
-			// $('.modal-backdrop').hide();
 			$('.modal-backdrop').remove();
-			// $('.modal-backdrop').eq(0).remove();
+		}, (result) => {
+			this.props.dispatch(alertMessage(result, 60000));
+		})
 	}
-	changetype(type){
+	changetype(type) {
 		this.setState({
-			type:type	
+			type: type
 		})
 	}
-	changeExchange(exchange){
-			this.setState({
-			exchange:exchange
+	changeExchange(exchange) {
+		this.setState({
+			exchange: exchange
 		})
 	}
-	render(){
+	render() {
 
 		const input = {
 			// width:'auto',
-			backgroundColor:'#333',
-			border:'2px solid #333',
-			boxShadow:'none'
+			backgroundColor: '#333',
+			border: '2px solid #333',
+			boxShadow: 'none'
 		}
-		 const modalStyle = {
+		const modalStyle = {
 			top: '10%',
-			left: document.body.clientWidth>900?document.body.clientWidth / 2 - 200:'0',
+			left: document.body.clientWidth > 900 ? document.body.clientWidth / 2 - 200 : '0',
 			right: 'auto',
 			bottom: 'auto',
-			width:document.body.clientWidth>900?400:'100%',
-			color:'#fff'
+			width: document.body.clientWidth > 900 ? 400 : '100%',
+			color: '#fff'
 		}
 		return (
 			<div >
@@ -103,10 +100,10 @@ class AddTrade extends Component{
 		)
 	}
 }
-const mapStateToProps =(state)=>{
- return{
-	
+const mapStateToProps = (state) => {
+	return {
+
 	};
 }
 
-export default connect(mapStateToProps)(AddTrade);//,{ alertHide }
+export default connect(mapStateToProps)(AddTrade); //,{ alertHide }

@@ -12,7 +12,7 @@ const topStyle = {
 	height: 'auto',
 	borderRadius: '2px',
 	color: '#fff',
-	overflow: 'auto',
+	// overflow: 'auto',
 }
 class TradeStrategys extends Component {
 	constructor(props) {
@@ -24,14 +24,16 @@ class TradeStrategys extends Component {
 		};
 	}
 	componentWillMount() {
-		
+
 	}
 	componentWillReceiveProps(nextProps) {
-		this.setState({
-			trueStra: nextProps.trueStra,
-			strategys: nextProps.strategys,
-			btstrategys: nextProps.btstrategys
-		})
+		if (nextProps.click) {
+			this.setState({
+				trueStra: nextProps.trueStra,
+				strategys: nextProps.strategys,
+				btstrategys: nextProps.btstrategys
+			})
+		}
 	}
 	render() {
 

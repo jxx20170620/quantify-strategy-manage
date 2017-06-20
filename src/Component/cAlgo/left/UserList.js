@@ -1,57 +1,68 @@
-import React,{Component} from 'react'
+import React, {
+	Component
+} from 'react'
 import {
 	alertMessage,
 	saveToChooseDate,
 	saveToChooseId,
 	RefreshList,
 	updateClass,
-	
+
 } from '../../../Redux/Action/Action'
 import {
 	connect
 } from 'react-redux'
 import AlertApp from '../../AlertApp'
 import {
-getUserList,
-givePermission,
-takeBack,
-deletUser
+	getUserList,
+	givePermission,
+	takeBack,
+	deletUser
 } from '../../../Redux/Action/shareAction'
 import $ from 'jquery'
 var _this;
-class UserList extends Component{
+class UserList extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			users:[],
-			delName:''
+			users: [],
+			delName: ''
 
 		};
 	}
-	componentWillReceiveProps(){
-	}
+	componentWillReceiveProps() {}
 	componentWillMount() {
 		// let UserLists=getUserList();
 		getUserList().then((data) => {
+			for (let i in data) {
+				if (data[i].username == 'admin') {
+					data.splice(i, 1);
+				}
+			}
 			this.setState({
 				users: data
 			})
 		})
 	}
-	changetype(type){
+	changetype(type) {
 		this.setState({
-			type:type	
+			type: type
 		})
 	}
-	changeExchange(exchange){
-			this.setState({
-			exchange:exchange
+	changeExchange(exchange) {
+		this.setState({
+			exchange: exchange
 		})
 	}
 
-	upData(){
+	upData() {
 		// let UserLists=getUserList();
 		getUserList().then((data) => {
+			for (let i in data) {
+				if (data[i].username == 'admin') {
+					data.splice(i, 1);
+				}
+			}
 			this.setState({
 				users: data
 			})
@@ -60,59 +71,57 @@ class UserList extends Component{
 
 	give(name, is_zijin, _this) {
 		if (is_zijin) {
-			_this.props.dispatch(alertMessage('该用户已经获得权限。',1000));
+			_this.props.dispatch(alertMessage('该用户已经获得权限。', 1000));
 			return;
 		}
 		if (givePermission(name, 1)) {
 			_this.upData();
-			_this.props.dispatch(alertMessage('操作成功！',1000));
+			_this.props.dispatch(alertMessage('操作成功！', 1000));
 		} else {
-			_this.props.dispatch(alertMessage('操作失败！',1000));
+			_this.props.dispatch(alertMessage('操作失败！', 1000));
 
 		}
 	}
 	back(name, is_zijin, _this) {
 		if (!is_zijin) {
-			_this.props.dispatch(alertMessage('该用户权限已经被收回。',1000));
+			_this.props.dispatch(alertMessage('该用户权限已经被收回。', 1000));
 			return;
 		}
 		if (givePermission(name, 0)) {
 			_this.upData();
-			_this.props.dispatch(alertMessage('操作成功！',1000));
+			_this.props.dispatch(alertMessage('操作成功！', 1000));
 		} else {
-			_this.props.dispatch(alertMessage('操作失败！',1000));
+			_this.props.dispatch(alertMessage('操作失败！', 1000));
 
 		}
 	}
-	delete(_this){
-		if(deletUser(_this.state.delName)){
-			_this.upData();		
-			_this.props.dispatch(alertMessage('删除成功！',1000));
-				
-		}
-		else{
-			_this.props.dispatch(alertMessage('删除失败！',1000));
+	delete(_this) {
+		if (deletUser(_this.state.delName)) {
+			_this.upData();
+			_this.props.dispatch(alertMessage('删除成功！', 1000));
+
+		} else {
+			_this.props.dispatch(alertMessage('删除失败！', 1000));
 		}
 	}
-	componentDidMount() {
-	}
-	render(){
-		 _this = this;
-		 const modalStyle = {
+	componentDidMount() {}
+	render() {
+		_this = this;
+		const modalStyle = {
 			top: '5%',
-			left: document.body.clientWidth>900?document.body.clientWidth / 2 - 300:'0',
+			left: document.body.clientWidth > 900 ? document.body.clientWidth / 2 - 300 : '0',
 			right: 'auto',
 			bottom: 'auto',
-			width:document.body.clientWidth>900?600:'100%',
+			width: document.body.clientWidth > 900 ? 600 : '100%',
 		}
-		 const delmodalStyle = {
+		const delmodalStyle = {
 			top: '10%',
-			left: document.body.clientWidth>900?document.body.clientWidth / 2 - 200:'0',
+			left: document.body.clientWidth > 900 ? document.body.clientWidth / 2 - 200 : '0',
 			right: 'auto',
 			bottom: 'auto',
-			width:document.body.clientWidth>900?400:'100%'
+			width: document.body.clientWidth > 900 ? 400 : '100%'
 		}
-		return(
+		return (
 
 			<div>
 				<div style={modalStyle} className="modal fade" id="UserList" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -144,7 +153,7 @@ class UserList extends Component{
 							    				<td>{x.is_zijin==true?'true':'false'}</td>
 							    				<td>
 							    					<div className="dropdown">
-							    				    <button id="dLabel" className="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							    				    <button id="dLabel" className="btn dropdown-toggle userlist_toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 							    				    操作<span className="caret"></span></button>
 							    				    <ul className="dropdown-menu" aria-labelledby="dLabel" style={{minWidth:'80px',left:'0',backgroundColor:'#3b3b3b'}}>
 							    				       <li style={{width:'100px'}} role="presentation" id="user_action">
@@ -188,14 +197,14 @@ class UserList extends Component{
                </div>
            </div>
 			</div>
-			)
+		)
 	}
 }
 
-const mapStateToProps =(state)=>{
- return{
-	
+const mapStateToProps = (state) => {
+	return {
+
 	};
 }
 
-export default connect(mapStateToProps)(UserList);//,{ alertHide }
+export default connect(mapStateToProps)(UserList); //,{ alertHide }

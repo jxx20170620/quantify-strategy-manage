@@ -2,15 +2,12 @@
 
      // console.log(window.location.href)
      // console.warn(window.location.href.indexOf('120.27.140.211') > 0 ? '%cAccess Server' : '%cAccess Localhost', 'background: #332a00; color: #ffdc9e');
-     // const dataBaseIp = 'http://101.37.28.206:81/';
-     // const dataBaseIp = 'http://101.37.28.206:8000/api/'
-     let dataBaseIp1 = 'http://120.27.140.211/api/';
-     // if (window.location.href.indexOf('192') > 0 || window.location.href.indexOf('121') > 0) {
-     //      dataBaseIp = 'http://121.41.19.183:8080/api/';
-     // }
-     let dataBaseIp = 'http://121.41.19.183:8080/api/';
+
+     let dataBaseIp = 'http://120.27.140.211/api/';
+
+     // let dataBaseIp = 'http://121.41.19.183:8080/api/';
+
      const oldDataBase = 'http://114.55.238.82:81/';
-     // oldDataBase = 'http://101.37.28.206:81/';
      let staticData = [];
 
      //获取浏览器
@@ -318,15 +315,18 @@
                          body += '&end_date=' + end_date;
                          body += '&type=bar';
                          $.ajax({
-                              url: 'http://121.41.19.183:8080/api/market_datas/' + body,
+                              url: dataBaseIp + 'market_datas/' + body,
                               headers: {
-                                   'Authorization': 'token 7e6e3af5f7a58513cf061300b989e798b0b6a2d3'
+                                   'Authorization': 'token ' + localStorage.getItem("token")
                               },
                               type: 'GET',
                               processData: false,
                               async: true,
                               success: function(data) {
-                                   // data = data[0]
+                                   if (typeof(data) == 'string') {
+                                        reject(data);
+                                        return;
+                                   }
                                    for (let i in data) {
                                         data[i].datetime = get_unix_timestamp(dateTodate(data[i].datetime));
                                    }
@@ -359,7 +359,7 @@
                          body += '&trade_date=' + trade_date;
                          body += '&type=' + type;
                          $.ajax({
-                              url: dataBaseIp1 + 'market_datas/' + body,
+                              url: dataBaseIp + 'market_datas/' + body,
                               headers: {
                                    'Authorization': 'token ' + localStorage.getItem("token")
                               },
@@ -480,8 +480,12 @@
      //获取用户列表
      // staticData.userList = [];
      export const getUserList = () => {
-          if (hasUserList) {
-               return staticData.userList;
+          if (localStorage.getItem("username") != 'admin') {
+               return new Promise((resolve, reject) => {
+                    getStrategys().then((flag) => {
+                         resolve(staticData.userList)
+                    })
+               });
           }
           return new Promise((resolve, reject) => {
                let userList = [];
@@ -505,23 +509,15 @@
 
                     },
                     error: function(data) {
-                         getStrategys().then((flag) => {
-                              resolve([{
-                                   username: localStorage.getItem("username")
-                              }])
-                         })
 
                     }
                })
-
-               // return userList;
           });
      }
      staticData.userList = [];
      export const debug = () => {
           if (localStorage.getItem("username") == 'admin') {
-               gateways('CSRPME');
-               gateways('OKCoin');
+
           } else {
                staticData.userList.push({
                     username: localStorage.getItem("username")
@@ -776,9 +772,8 @@
           return ok;
      }
 
-     //根据实例类型和id获取单个实例信息，包含log
-     export const getStrategy = (flag, id) => {
-          let type = flag ? 'strategys' : 'btstrategys';
+     //根据实例类型和id获取单个实例信息
+     export const getStrategy = (id) => {
           let Strategy;
           $.ajax({
                url: dataBaseIp + 'strategys/' + id + '/',
@@ -797,6 +792,26 @@
                }
           });
           return Strategy;
+     }
+     export const strategys = (id) => {
+          return new Promise((resolve, reject) => {
+               $.ajax({
+                    url: dataBaseIp + 'strategys/' + id + '/',
+                    headers: {
+                         'Authorization': 'token ' + localStorage.getItem("token")
+                    },
+                    type: 'GET',
+                    contentType: false,
+                    processData: false,
+                    async: true,
+                    success: function(data) {
+                         resolve(data)
+                    },
+                    error: function(data) {
+                         // getStrategy(!type,id);
+                    }
+               });
+          });
      }
      export const dateTodate = (date) => {
                return date.slice(0, 10) + ' ' + date.slice(11, 19);
@@ -850,8 +865,8 @@
                          async: true,
                          success: function(data) {
                               for (let i in data) {
-                                   if (data[i].name.length >= 20) {
-                                        data[i].shortname = cutStrForNum(data[i].name, 20);
+                                   if (data[i].name.length >= 18) {
+                                        data[i].shortname = cutStrForNum(data[i].name, 18);
                                    } else {
                                         data[i].shortname = data[i].name;
                                    }
@@ -891,6 +906,31 @@
                     });
                });
           }
+          //编辑策略代码 
+     export const pathCode = (formdata, id) => {
+               return new Promise((resolve, reject) => {
+                    let ok = '';
+                    $.ajax({
+                         url: dataBaseIp + 'scripts/' + id + '/',
+                         headers: {
+                              // "Content-Type": 'multipart/form-data',
+                              'Authorization': 'token ' + localStorage.getItem("token")
+                         },
+                         type: 'PATCH',
+                         data: formdata,
+                         contentType: false,
+                         processData: false,
+                         async: true,
+                         success: function(data) {
+                              resolve(data)
+                         },
+                         error: function(data) {
+                              reject(data)
+                         }
+                    });
+               });
+
+          }
           //获取单个预测代码信息
      export const getScripts = (id) => {
                return new Promise((resolve, reject) => {
@@ -906,7 +946,7 @@
                               resolve(data);
                          },
                          error: function(data) {
-                              resolve([]);
+                              reject([]);
                          }
                     });
 
@@ -922,10 +962,32 @@
           return false;
      }
 
-
+     // 获取url的参数
+     export const queryString = () => {
+          let url = window.location.href;
+          return url.slice(url.lastIndexOf('/') + 1, url.length);
+     };
+     // export const queryString = () => {
+     //      let _queryString = {};
+     //      const _query = window.location.search.substr(1);
+     //      const _vars = _query.split('&');
+     //      _vars.forEach((v, i) => {
+     //           const _pair = v.split('=');
+     //           if (!_queryString.hasOwnProperty(_pair[0])) {
+     //                _queryString[_pair[0]] = decodeURIComponent(_pair[1]);
+     //           } else if (typeof _queryString[_pair[0]] === 'string') {
+     //                const _arr = [_queryString[_pair[0]], decodeURIComponent(_pair[1])];
+     //                _queryString[_pair[0]] = _arr;
+     //           } else {
+     //                _queryString[_pair[0]].push(decodeURIComponent(_pair[1]));
+     //           }
+     //      });
+     //      return _queryString;
+     // };
      //添加策略代码 
      export const addClass = (formdata) => {
-               let ok = false;
+          return new Promise((resolve, reject) => {
+               let ok = '';
                $.ajax({
                     url: dataBaseIp + 'scripts/',
                     headers: {
@@ -936,23 +998,25 @@
                     data: formdata,
                     contentType: false,
                     processData: false,
-                    async: false,
+                    async: true,
                     success: function(data) {
-                         ok = true;
+                         resolve(data)
                     }.bind(this),
                     error: function(data) {
+
                          if (data.status == 403) {
                               ok = '您没有权限，请联系管理员';
                          } else {
                               ok = '网络错误';
                          }
-                         // ok = data.responseText;
-                         // console.log('添加失败', data);
+                         reject(ok)
                     }.bind(this),
                });
-               return ok;
-          }
-          //删除策略代码
+          });
+
+     }
+
+     //删除策略代码
      export const delClass = (id) => {
                let ok;
                $.ajax({
@@ -1019,6 +1083,8 @@
      staticData.btstrategys = [];
      staticData.predictStras = [];
      staticData.predictBtras = [];
+     staticData.his_strategys = [];
+     staticData.all_stra = [];
      //获取实盘／回测
      export const getStrategys = () => {
                return new Promise((resolve, reject) => {
@@ -1027,6 +1093,7 @@
                     let BtstrategyList = [];
                     let PredictStraList = [];
                     let PredictBtraList = [];
+                    let HisStraList = [];
                     $.ajax({
                          url: dataBaseIp + 'strategys' + '/',
                          headers: {
@@ -1037,7 +1104,12 @@
                          processData: false,
                          async: true,
                          success: function(data) {
+                              staticData.all_stra = data;
+                              let HisStraList = [];
                               for (let i in data) {
+                                   if (data[i].mode == 'realtime' && data[i].status == 4) {
+                                        HisStraList.push(data[i])
+                                   }
                                    data[i].datetime = dateTodate(data[i].datetime);
                                    if (data[i].mode == 'realtime') {
                                         if (data[i].account_id != null) {
@@ -1048,7 +1120,6 @@
                                              } else {
                                                   StrategyList.push(data[i]);
                                              }
-
                                         }
                                    } else {
                                         if (data[i].script_mode == 'predict') {
@@ -1059,11 +1130,13 @@
 
                                    }
                               }
+
                               staticData.trueStras = TrueStraList;
                               staticData.strategys = StrategyList;
                               staticData.btstrategys = BtstrategyList;
                               staticData.predictStras = PredictStraList;
                               staticData.predictBtras = PredictBtraList;
+                              staticData.his_strategys = HisStraList;
                               resolve(true);
                          },
                          error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -1076,33 +1149,42 @@
           }
           //获取所有实盘/历史回测列表
      export const getAllStrategy = (flag) => {
-          return flag ? staticData.strategys : staticData.btstrategys;
-     }
-
-     //将时间差时间戳转换成时间格式
+               return flag ? staticData.strategys : staticData.btstrategys;
+          }
+          //产生随机数
+     export const randomNum = (MIN, MAX) => {
+               let num;
+               num = Math.floor(((MAX - MIN) + 1) * Math.random() + MIN);
+               return num;
+          }
+          //将时间差时间戳转换成时间格式
      export const newTotalTime = (time) => {
-          let hour = 0;
-          //这里因为都需要把 小时数归零 所以 hour = 0 定义在外面
-          let min = parseInt((time) / 1000 / 60);
-          //分钟 的计算 除以 1000 是除去毫秒 之后 除以 60 计算出带小数点的分钟数 这里需要取整
-          let sec = Math.ceil((((time) / 1000 / 60) - min) * 60);
-          //秒 的计算 同分钟 这里用带毫秒的分钟数 减去 取整 后的分钟数 得到小数点后的 数值 之后 *60 向上取整 得到正确 秒
-          if (min >= 60) {
-               hour = parseInt(min / 60);
-               min = min - hour * 60;
+               let hour = 0;
+               //这里因为都需要把 小时数归零 所以 hour = 0 定义在外面
+               let min = parseInt((time) / 1000 / 60);
+               //分钟 的计算 除以 1000 是除去毫秒 之后 除以 60 计算出带小数点的分钟数 这里需要取整
+               let sec = Math.ceil((((time) / 1000 / 60) - min) * 60);
+               //秒 的计算 同分钟 这里用带毫秒的分钟数 减去 取整 后的分钟数 得到小数点后的 数值 之后 *60 向上取整 得到正确 秒
+               if (min >= 60) {
+                    hour = parseInt(min / 60);
+                    min = min - hour * 60;
+               }
+               if (sec >= 60) {
+                    min += parseInt(sec / 60);
+                    sec = sec - parseInt(sec / 60) * 60;
+               }
+               if (hour < 10) hour = "0" + hour;
+               if (min < 10) min = "0" + min;
+               if (sec < 10) sec = "0" + sec;
+               let totalTime = hour + ":" + min + ":" + sec;
+               return totalTime;
           }
-          if (sec >= 60) {
-               min += parseInt(sec / 60);
-               sec = sec - parseInt(sec / 60) * 60;
+          //验证日期格式
+     export const strDateTime = (str) => {
+               var a = /^(\d{4})-(\d{2})-(\d{2})$/;
+               return !a.test(str);
           }
-          if (hour < 10) hour = "0" + hour;
-          if (min < 10) min = "0" + min;
-          if (sec < 10) sec = "0" + sec;
-          let totalTime = hour + ":" + min + ":" + sec;
-          return totalTime;
-     }
-
-     //下载文件
+          //下载文件
      export const downFile = (text, name) => {
           let file = new Blob([text], {
                // type: 'text/csv'
@@ -1193,11 +1275,8 @@
                          processData: false,
                          async: false,
                          success: function(data) {
-                              nianhuaList.push({
-                                   datetime: dateList[i],
-                                   aror: data.aror,
-                                   row: data.row,
-                              })
+                              data.date = dateList[i];
+                              nianhuaList.push(data)
                          },
                          error: function(data) {
                               // reject([])
@@ -1237,10 +1316,10 @@
                     processData: false,
                     async: true,
                     success: function(data) {
-                         resolve(true);
+                         resolve(data);
                     },
                     error: function(data) {
-                         resolve(false);
+                         reject(data);
                     }   ,
                     xhr: function() {    
                          let xhr = $.ajaxSettings.xhr();    
@@ -1666,6 +1745,7 @@
           return getData;
      }
 
+     staticData.predictChart = [];
      //获取已有数据
      export const getStatic = () => {
                return staticData;
@@ -1712,8 +1792,27 @@
           okData = okData.concat(withoutDate);
           return okData;
      }
-
-     //将交易产品列表进行排序 先按日期 再按年化 最后按照创建时间 b-a(降序)
+     export const getCpu = (datetime) => {
+               return new Promise((resolve, reject) => {
+                    $.ajax({
+                         url: "http://120.27.140.211:19999/api/v1/data?chart=system.cpu&format=array&points=300&group=average&options=absolute|jsonwrap|nonzero&after=-300&_=" + datetime,
+                         headers: {
+                              'Content-Type': undefined
+                         },
+                         type: 'GET',
+                         contentType: false,
+                         processData: false,
+                         async: false,
+                         success: function(data) {
+                              resolve(data)
+                         },
+                         error: function(data) {
+                              reject(data)
+                         }
+                    });
+               });
+          }
+          //将交易产品列表进行排序 先按日期 再按年化 最后按照创建时间 b-a(降序)
      export const sortNianhua = (data) => {
           let okData = [];
           let haveDate = [];

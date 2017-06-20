@@ -12,7 +12,8 @@ import {
 	showCode,
 	alertMessage,
 	updateClass,
-	showLog
+	showLog,
+	runBackTest
 } from '../../../Redux/Action/Action'
 import {
 	delClass,
@@ -87,6 +88,7 @@ var ListTodo = React.createClass({
 			listStyle: 'listback',
 			delname: '',
 			delId: '',
+			clickPredict_id:''
 		};
 	},
 	componentDidMount: function() {
@@ -97,6 +99,9 @@ var ListTodo = React.createClass({
 		$(' #class_id ').val(id);
 		$(' #class_type ').text('交易名');
 		$(' #add_script_name ').html(name);
+		$(' #choose_strategy_div ').css('display','block');
+		$('#choose_strategy_type').attr("disabled",false);
+		Prop.dispatch(runBackTest(false));
 	},
 	show: function(id, event) {
 		if ($('#' + id).css('display') == 'none') {
@@ -161,9 +166,21 @@ var ListTodo = React.createClass({
 			clickPredict_id: id
 		})
 	},
+	hideOther:function(id){
+		let data = this.props.todo;
+		for(let i in data){
+			if(data[i].id!=id){
+				$('#collapse_detail_' + data[i].id).removeClass('in');
+			}
+		}
+	},
 	render: function() {
 		const back_son = {
-			marginLeft: '5px'
+			marginLeft: '5px',
+			height:'30px'
+		}
+		const boderStyle = {
+			border: '1px solid #666'
 		}
 		let o = this;
 		let classs = this.props.todo.map((x, index) => {
@@ -179,7 +196,8 @@ var ListTodo = React.createClass({
 			}
 			return (
 				<div  key={index}>
-		    <div className='dropdown smallfont2' id={x.id+'2'} className='listback'
+		    <div className='dropdown smallfont2' id={x.id+'2'} 
+		    className={localStorage.getItem("username") == 'admin'?"listback":"listback2"}
 		    onMouseOut={o.onMouseOut.bind(null,x.id)}
 		    onMouseOver={o.onMouseOver.bind(null,x.id)} title={x.error}>
 		    <i className="predictCircle fa fa-plus-circle collapsed"
@@ -193,8 +211,51 @@ var ListTodo = React.createClass({
 				data-target={"#delClass_predict_" + Prop.username} title="删除" onClick={o.delClass.bind(null,x.id,x.name,Prop.username)}></i>
 				<i onMouseOut={(e)=>{e.target.style.color = '#fff'}} onMouseOver={(e)=>{e.target.style.color = '#88e7ff'}} style={istyle3} className="fa fa-pencil" title="代码" 
 				onClick={o.show2.bind(null,x.id)}></i>
+				<i onMouseOut={(e)=>{e.target.style.color = '#fff'}} onMouseOver={(e)=>{e.target.style.color = '#88e7ff'}} style={istyle2} className="glyphicon glyphicon-chevron-down" 
+				 data-toggle="collapse" data-target={'#collapse_detail_' + x.id}
+				 onClick={o.hideOther.bind(null,x.id)}></i>
 			    <span style={circle} className="predict_his smallfont " title="历史回测">{x.btstrategys.length}</span>
 			    <span style={circle} className="predict_real smallfont " title="实盘预测">{x.strategys.length}</span>
+
+       
+		    <div className='smallfont collapse' id={'collapse_detail_' + x.id}>
+					     {/*<div style={back_son}>
+					    	{x.name}
+					    	&nbsp;({x.username})
+				        </div>*/}	
+					    <div style={back_son}>
+					    	{x.datetime}				
+					    </div>
+
+                       <table style={{marginTop:'10px',marginBottom:'0px',width:'96%',marginLeft:'2%',backgroundColor:'#3b3b3b'}} 
+                       className="table table-bordered table-hover">
+                       <thead>
+                         <tr>
+                           <th style={boderStyle}>预测变量</th>
+                           <th style={boderStyle}>变量类型</th>
+                           <th style={boderStyle}>预测内容</th>
+                         </tr>
+                         </thead>
+                        <tbody>
+                          
+					    {
+					    	x.predict_format.map(function(x, index) {
+					    		return (
+					    			<tr key={index}>
+					    			<td style={boderStyle}>{x.name}</td>
+					    			<td style={boderStyle}>{x.type}</td>
+					    			<td style={boderStyle}>{x.information}</td>
+					    			  </tr>
+					    			)
+					    	})
+					    }
+					  
+					 </tbody>
+					     </table>
+					     <div style={{height:'5px'}}>&nbsp;</div>
+			</div>
+	
+
 			</div>
 
 		<div className='collapse predictMenu' id={'collapse_' + x.id}>
@@ -245,7 +306,7 @@ class PredictList extends Component {
 		};
 	}
 	putScreen() {
-		let data = this.props.predict;
+		let data = Prop.predict;
 		data.sort(getSortFun('desc', 'name')); //按classname升序存放
 		let staticData = getStatic();
 		let strategys = staticData.predictStras;
@@ -268,15 +329,13 @@ class PredictList extends Component {
 			todolist: data,
 		});
 	}
-	shouldComponentUpdate(nextProps, nextState) {
 
-	}
 	componentWillReceiveProps(nextProps) {
-
+		Prop = nextProps;
+		this.putScreen();
 	}
 	componentWillMount() {
 		Prop = this.props;
-
 		this.putScreen();
 	}
 	componentDidMount() {

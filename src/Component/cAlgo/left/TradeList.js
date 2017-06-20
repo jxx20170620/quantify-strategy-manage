@@ -12,7 +12,8 @@ import {
 	showCode,
 	alertMessage,
 	updateClass,
-	showLog
+	showLog,
+	runBackTest
 } from '../../../Redux/Action/Action'
 import {
 	delClass,
@@ -87,6 +88,7 @@ var ListTodo = React.createClass({
 			listStyle: 'listback',
 			delname: '',
 			delId: '',
+			clickTrade_id:''
 		};
 	},
 	componentDidMount: function() {
@@ -97,6 +99,9 @@ var ListTodo = React.createClass({
 		$(' #class_id ').val(id);
 		$(' #class_type ').text('交易名');
 		$(' #add_script_name ').html(name);
+		$(' #choose_strategy_div ').css('display','block');
+		$('#choose_strategy_type').attr("disabled",false);
+		Prop.dispatch(runBackTest(false));
 	},
 	show: function(id, event) {
 		if ($('#' + id).css('display') == 'none') {
@@ -161,9 +166,18 @@ var ListTodo = React.createClass({
 			clickTrade_id: id
 		})
 	},
+	hideOther:function(id){
+		let data = this.props.todo;
+		for(let i in data){
+			if(data[i].id!=id){
+				$('#collapse_detail_' + data[i].id).removeClass('in');
+			}
+		}
+	},
 	render: function() {
 		const back_son = {
-			marginLeft: '5px'
+			marginLeft: '5px',
+			height:'30px'
 		}
 		let o = this;
 		let classs = this.props.todo.map((x, index) => {
@@ -180,7 +194,8 @@ var ListTodo = React.createClass({
 			let _id = "trade_detail" + index;
 			return (
 				<div  key={index}>
-		    <div className='dropdown smallfont2' id={x.id+'2'} className='listback'
+		    <div className='dropdown smallfont2' id={x.id+'2'} 
+		    className={localStorage.getItem("username") == 'admin'?"listback":"listback2"}
 		    onMouseOut={o.onMouseOut.bind(null,x.id)}
 		    onMouseOver={o.onMouseOver.bind(null,x.id)} title={x.error}>
 		    <i className="tradeCircle fa fa-plus-circle collapsed"
@@ -194,9 +209,26 @@ var ListTodo = React.createClass({
 				data-target={"#delClass_" + Prop.username} title="删除" onClick={o.delClass.bind(null,x.id,x.name,Prop.username)}></i>
 				<i onMouseOut={(e)=>{e.target.style.color = '#fff'}} onMouseOver={(e)=>{e.target.style.color = '#88e7ff'}} style={istyle3} className="fa fa-pencil" title="代码" 
 				onClick={o.show2.bind(null,x.id)}></i>
+				<i onMouseOut={(e)=>{e.target.style.color = '#fff'}} onMouseOver={(e)=>{e.target.style.color = '#88e7ff'}} style={istyle2} className="glyphicon glyphicon-chevron-down" 
+				 data-toggle="collapse" data-target={'#collapse_detail_' + x.id}
+				 onClick={o.hideOther.bind(null,x.id)}></i>
 			    <span style={circle} className="his smallfont " title="历史回测">{x.btstrategys.length}</span>
 			    <span style={circle} className="real smallfont " title="实盘模拟">{x.strategys.length}</span>
 			    <span style={circle} className="true smallfont " title="真实交易">{x.trueStra.length}</span>
+			   
+			   <div className='smallfont collapse' id={'collapse_detail_' + x.id}>
+					    {/* <div style={back_son}>
+					    	{x.name}
+					    	&nbsp;({x.username})
+				        </div>*/}
+					    <div style={back_son}>
+					    	{x.datetime}				
+					    </div>
+
+					     <div style={{height:'5px'}}>&nbsp;</div>
+			   
+			   </div>
+
 			</div>
 
 		<div className='collapse tradeMenu' id={'collapse_' + x.id}>
@@ -248,7 +280,7 @@ class TradeList extends Component {
 		};
 	}
 	putScreen() {
-		let data = this.props.trade;
+		let data = Prop.trade;
 		data.sort(getSortFun('desc', 'name')); //按classname升序存放
 		let staticData = getStatic();
 		let trueStra = staticData.trueStras;
@@ -279,11 +311,13 @@ class TradeList extends Component {
 			todolist: data,
 		});
 	}
-	shouldComponentUpdate(nextProps, nextState) {
-
-	}
 	componentWillReceiveProps(nextProps) {
-
+		$('.tradeCircle').each(function(i) {
+			$(this).attr("class", "tradeCircle fa fa-plus-circle collapsed");
+			$(this).parent().removeClass('open');
+		})
+		Prop = nextProps;
+		this.putScreen();
 	}
 	componentWillMount() {
 		Prop = this.props;

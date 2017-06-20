@@ -29,7 +29,9 @@ const divStyle = {
 	// backgroundColor:'#fff',
 	// paddingTop:'5px',
 }
-
+import {
+	introJs
+} from 'intro.js';
 const exit = {
 	display: 'block',
 	cursor: "pointer",
@@ -44,7 +46,7 @@ class Head extends Component {
 			date: '',
 			titleColor: '#fff',
 			marketDetail: [],
-			type:'id'
+			type: 'id'
 		}
 	}
 	componentWillReceiveProps(nextProps) {
@@ -99,42 +101,33 @@ class Head extends Component {
 	}
 
 	print() {
-		let hasActive = [];
-		let num = 0;
-		$('.needPrint').each(function(i) {
-			if ($(this).hasClass('active')) {
-				hasActive[num++] = i;
-			}
-			$(this).addClass('active');
-		});
-		let a = $('#TradeDetail').height();
-		let b = $('#TradeAnalysis').height();
-		let c = $('#tableDetail').height();
-		let d = $('#tableAnalysis').height();
-		$('#TradeDetail').css('height', 'auto');
-		$('#TradeAnalysis').css('height', 'auto');
-		$('#tableDetail').css('height', 'auto');
-		$('#tableAnalysis').css('height', 'auto');
+
 		document.title = this.state.name == '' ? this.state.marketDetail.symbol : this.state.name;
 		document.title += '_' + this.state.marketDetail.date;
 
+		$('#root').css('display', 'none');
+		$('#need_print').css('display', 'block');
+
+		// var printData = document.getElementById("right_div").innerHTML;
+		var markert_chart = document.getElementById("markert_chart").innerHTML;
+		var run_chart = document.getElementById("run_chart").innerHTML;
+		var profit_chart = document.getElementById("profit_chart").innerHTML;
+		var TradeDetail = document.getElementById("TradeDetail").innerHTML;
+		var TradeAnalysis = document.getElementById("TradeAnalysis").innerHTML;
+		document.getElementById("need_print").innerHTML = markert_chart + run_chart + profit_chart + TradeDetail + TradeAnalysis;
+
 		window.print();
 
-		$('#TradeDetail').css('height', a);
-		$('#TradeAnalysis').css('height', b);
-		$('#tableDetail').css('height', c);
-		$('#tableAnalysis').css('height', d);
-		$('.needPrint').each(function(i) {
-			$(this).removeClass('active');
-		});
-		for (let i = 0; i < num; i++) {
-			$('.needPrint').eq(hasActive[i]).addClass('active');
-		}
+		$('#need_print').css('display', 'none');
+		$('#root').css('display', 'block');
+
 		document.title = 'TuringAlgo';
 
 
 	}
 	showCode(codeType) {
+		$('#myModal2').addClass('in');
+		$('#myModal2').css('display', 'block');
 		this.props.dispatch(showMyCode(codeType));
 		this.props.dispatch(ShowList('myCode'));
 	}
@@ -153,6 +146,57 @@ class Head extends Component {
 		}
 		$('#exit_button').css('width', $('#hello_user').css('width'))
 		$('#change_button').css('width', $('#hello_user').css('width'))
+	}
+	showPredict() {
+		$('#addPredict_code').css('display', 'block');
+		$('#addPredict_code').addClass('in');
+		$('#myModal2').addClass('in');
+		$('#myModal2').css('display', 'block');
+		this.props.dispatch(showMyCode('predict'));
+		this.props.dispatch(ShowList('myPredict'));
+		setTimeout(() => {
+			var intro = introJs();
+			intro.setOptions({
+				steps: [{
+					element: document.querySelectorAll('#addPredict_code')[0],
+					intro: "填写预测目标、变量",
+					position: 'left'
+				}, {
+					element: document.querySelector('#mycode_editor'),
+					intro: "使用Python语言编写策略",
+					position: 'left'
+				}, {
+					element: document.querySelector('#run_back_btn'),
+					intro: "使用策略代码运行回测",
+					position: 'left'
+				}, {
+					element: document.querySelectorAll('#myModal2')[0],
+					// element: document.querySelector('#add_strategy_dialog'),
+					intro: "填写实例信息",
+					position: 'left'
+				}]
+			});
+			intro.onchange(function(targetElement) {
+				let step = this._currentStep;
+				// console.log(step)
+				if (step == 1) {
+					$('#addPredict_code').css('display', 'none');
+					$('#addPredict_code').removeClass('in');
+				}
+			});
+			intro.onexit(() => {
+				$('#myModal2').removeClass('in');
+				$('#myModal2').css('display', 'none');
+				$('.modal-backdrop').eq(0).remove();
+				$('#addPredict_code').css('display', 'none');
+				$('#addPredict_code').removeClass('in');
+				// this.props.dispatch(ShowList('id'));
+				// $('#addPredict_code').css('display', 'block');
+				// $('#addPredict_code').addClass('in');
+
+			}).start()
+		}, 200)
+
 	}
 	render() {
 		let o = this;
@@ -209,6 +253,7 @@ class Head extends Component {
 			<li className="menu_li"><a>平台管理</a>
 				<ul className="submenu">
 					<li><a href='http://120.27.140.211:19999/' target="_blank"><i className="fa fa-bell"></i> 性能监控</a></li>
+				    <li><a href="/#/Dashboard" target="_blank"><i className="fa fa-pie-chart"></i> Manage</a></li>
 				</ul>
 			</li>:null}
 			
@@ -221,10 +266,12 @@ class Head extends Component {
 			
 			<li className="menu_li"><a>新建代码</a>
 				<ul className="submenu">
-					<li><a onClick={(e)=>this.showCode('trade')}><i className="fa fa-pencil-square-o"></i> 交易代码</a></li>
 					<li><a 
-					data-toggle="modal" data-target="#addPredict_code"
-					// onClick={(e)=>this.showCode('predict')}
+					// data-toggle="modal" data-target="#myModal2"
+					onClick={(e)=>this.showCode('trade')}><i className="fa fa-pencil-square-o"></i> 交易代码</a></li>
+					<li><a 
+					// data-toggle="modal" data-target="#addPredict_code"
+					onClick={(e)=>this.showPredict()}
 					><i className="fa fa-pencil-square-o"></i> 预测代码</a></li>
 				</ul>
 			</li>
@@ -262,7 +309,7 @@ const mapStateToProps = (state) => {
 	return {
 		title: state.reduShowDataTitle,
 		marketDetail: state.reduShowMarketDetail,
-		type:state.reduToShowList
+		type: state.reduToShowList
 	};
 }
 export default connect(mapStateToProps)(Head);

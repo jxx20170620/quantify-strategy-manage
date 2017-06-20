@@ -71,7 +71,19 @@ input {
 .bootstrap-select button {
     width: 90%!important;
     border: 0px!important;
+    background-color: #525252;
 }
+.bootstrap-select li {
+    margin-left: 0px;
+}
+.bootstrap-select a {
+    margin-left: -30px;
+}
+/*.bootstrap-select button:hover {
+    width: 90%!important;
+    border: 0px!important;
+    background-color: #525252;
+}*/
 
 .bootstrap-select .dropdown-menu {
     min-width: 90%!important;
@@ -189,8 +201,6 @@ button:hover {
 }
 
 
-
-
 /*.leftDiv{
     background-color: red
 }*/
@@ -218,9 +228,11 @@ button:hover {
 #rightCenter {
     margin-top: -35px;
 }
+
 body {
     overflow: hidden;
 }
+
 @media screen and (max-width: 900px) {
     body {
         overflow: auto;
@@ -291,6 +303,27 @@ body {
     #TradeAnalysis {
         margin-top: 2800px;
     }
+}
+
+#alert_app {
+    margin: 0 auto;
+    position: absolute;
+    z-index: 99999;
+    top: 5%;
+    height: auto;
+    border-radius: 6px;
+    color: #fff;
+    text-align: center;
+    background-color: #7B9966;
+    border: 1px solid #fff;
+    // max-height: 400px;
+    // min-width: 300px;
+    // min-height: 35px;
+    padding: 5px 10px;
+    overflow: auto;
+    right: auto;
+    bottom: auto;
+    font-family: Neue;
 }
 
 .list-group-item {
